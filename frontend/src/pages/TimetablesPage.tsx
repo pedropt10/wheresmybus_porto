@@ -74,7 +74,7 @@ export function TimetablesPage() {
         <button 
           onClick={() => setActiveTab("stop")}
           style={tabStyle(activeTab === "stop")}
-        >🚏 Stop Search</button>
+        >🚏 Stop Search (WIP)</button>
       </div>
 
       {/* Search Controls */}

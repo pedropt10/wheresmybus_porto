@@ -1,7 +1,7 @@
 import "leaflet/dist/leaflet.css";
 import React, { useMemo, useEffect } from "react";
 import L from 'leaflet';
-import { MapContainer, TileLayer, Popup, Polyline, CircleMarker, useMap, Pane } from "react-leaflet";
+import { MapContainer, TileLayer, Popup, Polyline, CircleMarker, useMap, Pane, Marker } from "react-leaflet";
 import type { VehicleLatest, TripShape, Stop } from "../api/client";
 // Reuse your existing color logic
 import { getRouteColors, getDirectionDestination } from "./Map"; 
@@ -40,6 +40,67 @@ export function HistoryMap({ vehicles, shapeData, selectedRoute, stops }: Props)
     () => getRouteColors(selectedRoute, 0),
     [selectedRoute]
   );
+
+  // WIP: Custom bus icon
+  const getCustomIcon = (idx: number, total: number, bgColor: string, textColor: string, heading: number) => {
+    const isSpecial = idx === 0 || idx === total - 1;
+    let busIconFillColor = "white";
+    if (isSpecial) {
+      busIconFillColor = "#5FDDC2";
+    }
+
+    let busSvg = '';
+
+    if (heading > 180) {
+      const busRotation = heading + 90; // Use the heading from the vehicle data
+      // A simple Bus SVG as a string: bounding box, windows & door, wheels
+      busSvg = `
+        <svg width="30" height="30" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"
+          style="transform: rotate(${busRotation}deg); transform-origin: center;">
+          <rect x="5" y="10" width="30" height="16" rx="3" fill="${busIconFillColor}" stroke="var(--text-secondary)" stroke-width="1.0" />
+          
+          <rect x="7" y="13" width="2" height="9" rx="1" fill="#333"" opacity="0.6" />
+          <rect x="11" y="14" width="6" height="5" rx="1" fill="#333"" opacity="0.6" />
+          <rect x="19" y="13" width="6" height="10" rx="1" fill="#333"" opacity="0.6" />
+          <rect x="27" y="14" width="6" height="5" rx="1" fill="#333"" opacity="0.6" />
+
+          <circle cx="12" cy="26" r="3" fill="#333" stroke="var(--text-secondary)" />
+          <circle cx="28" cy="26" r="3" fill="#333" stroke="var(--text-secondary)" />
+        </svg>
+      `;
+    } else {
+      const busRotation = heading - 90; // Use the heading from the vehicle data
+      // A simple Bus SVG as a string: bounding box, windows & door, wheels
+      busSvg = `
+        <svg width="30" height="30" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"
+          style="transform: rotate(${busRotation}deg); transform-origin: center;">
+          <rect x="5" y="10" width="30" height="16" rx="3" fill="${busIconFillColor}" stroke="var(--text-secondary)" stroke-width="1.0" />
+          
+          <rect x="31" y="13" width="2" height="9" rx="1" fill="#333"" opacity="0.6" />
+          <rect x="23" y="14" width="6" height="5" rx="1" fill="#333"" opacity="0.6" />
+          <rect x="15" y="13" width="6" height="10" rx="1" fill="#333"" opacity="0.6" />
+          <rect x="7" y="14" width="6" height="5" rx="1" fill="#333"" opacity="0.6" />
+
+          <circle cx="12" cy="26" r="3" fill="#333" stroke="var(--text-secondary)" />
+          <circle cx="28" cy="26" r="3" fill="#333" stroke="var(--text-secondary)" />
+        </svg>
+      `;
+    }
+
+    // Wrap the SVG and the Label in a div
+    const html = `
+      <div style="position: relative; display: flex; justify-content: center; align-items: center;">
+        ${busSvg}
+      </div>
+    `;
+
+    return L.divIcon({
+      html: html,
+      className: "", // Clear default leaflet styles
+      iconSize: [30, 30],
+      iconAnchor: [15, 15],
+    });
+  };
 
   return (
     <MapContainer
@@ -134,17 +195,23 @@ export function HistoryMap({ vehicles, shapeData, selectedRoute, stops }: Props)
         const v_label = v.vehicle_id;
 
         return (
-          <CircleMarker
+          // <CircleMarker
+          //   key={`${v.observed_at}-${idx}`}
+          //   center={[v.lat, v.lon]}
+          //   radius={idx === 0 || idx === vehicles.length - 1 ? 8 : 4} // Make the first and the last known point bigger
+          //   pane="history-pings-pane"
+          //   pathOptions={{
+          //     color: "white",
+          //     fillColor: bgColor,
+          //     fillOpacity: 1,
+          //     weight: 1.5,
+          //   }}
+          // >
+          <Marker
             key={`${v.observed_at}-${idx}`}
-            center={[v.lat, v.lon]}
-            radius={idx === vehicles.length - 1 ? 7 : 4} // Make the "last" known point bigger
+            position={[v.lat, v.lon]}
+            icon={getCustomIcon(idx, vehicles.length, bgColor, textColor, v.heading ?? 0)}
             pane="history-pings-pane"
-            pathOptions={{
-              color: idx === vehicles.length - 1 ? "#000" : "white",
-              fillColor: bgColor,
-              fillOpacity: 1,
-              weight: 1.5,
-            }}
           >
             <Popup pane="popup-pane">
               <div style={{ fontSize: "13px", minWidth: "140px" }}>
@@ -165,19 +232,22 @@ export function HistoryMap({ vehicles, shapeData, selectedRoute, stops }: Props)
                 <div style={{ fontSize: "12px" }}>
                   <div>🚌 <b>Vehicle:</b> {v_label}</div>
                   {(v.cur_stop_id && v.last_stop_id) && (
-                    <div style={{ marginTop: "4px", color: "#444" }}>
+                    <div style={{ marginTop: "4px", color: "var(--text-secondary)" }}>
                       🚏 <b>At stop:</b> {v.last_stop_name}
                     </div>
                   )}
                   {(!v.cur_stop_id && v.last_stop_id) && (
-                    <div style={{ marginTop: "4px", color: "#444" }}>
+                    <div style={{ marginTop: "4px", color: "var(--text-secondary)" }}>
                       🚏 <b>Near:</b> {v.last_stop_name}
                     </div>
                   )}
+                  <div style={{ marginTop: "4px", color: "var(--text-secondary)" }}>
+                    🚏 <b>Heading:</b> {v.heading}
+                  </div>
                 </div>
               </div>
             </Popup>
-          </CircleMarker>
+          </Marker>
         );
       })}
 

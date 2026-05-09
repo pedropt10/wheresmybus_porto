@@ -2,7 +2,7 @@ from fastapi import APIRouter, Query, HTTPException
 from app.services.vehicles import get_latest_by_route_and_direction, get_latest_by_fleet_id
 from app.models.vehicles import VehicleLatest
 
-router = APIRouter(tags=["vehicles"])
+router = APIRouter(tags=["Vehicles"])
 
 @router.get("/latest", response_model=list[VehicleLatest])
 def latest(

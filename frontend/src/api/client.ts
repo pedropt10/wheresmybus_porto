@@ -1,3 +1,7 @@
+// ==================================
+//          OBSERVATIONS
+// ==================================
+
 export type VehicleLatest = {
   vehicle_id: string | null;
   route_id: string | null;
@@ -21,15 +25,6 @@ export type VehicleLatest = {
   route_short_name?: string | null;
 };
 
-export type Stop = {
-  stop_id: string;
-  stop_name: string;
-  lat: number;
-  lon: number;
-  zone_id: string;
-  stop_url: string;
-};
-
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 export async function fetchLatest(routeId?: string, direction?: number | null): Promise<VehicleLatest[]> {
@@ -45,6 +40,27 @@ export async function fetchLatest(routeId?: string, direction?: number | null): 
   return res.json();
 }
 
+
+export async function fetchHistory(params: {
+  mode: "trip" | "route";
+  route_id: string;
+  date: string;
+  trip_id?: string;
+  start_time?: string;
+  end_time?: string;
+}): Promise<VehicleLatest[]> 
+{
+  const query = new URLSearchParams(params as any).toString();
+  const res = await fetch(`${API_BASE}/api/history?${query}`);
+  if (!res.ok) throw new Error("Failed to fetch history");
+  return res.json();
+}
+
+
+// ==================================
+//              SHAPES
+// ==================================
+
 export type RouteShape = {
   coordinates: [number, number][];
   color: string;
@@ -53,7 +69,7 @@ export type RouteShape = {
 export async function fetchRouteShape(routeId: string, directionId: number | null): Promise<RouteShape | null> {
   if (!routeId || directionId === null) return null;
   
-  const url = new URL(`${API_BASE}/api/shapes/route?routeId=${routeId}&directionId=${directionId}`);
+  const url = new URL(`${API_BASE}/api/shapes/route`);
   url.searchParams.set("route_id", routeId.trim());
   url.searchParams.set("direction_id", String(directionId));
 
@@ -71,11 +87,15 @@ export type TripShape = {
   coordinates: [number, number][];
 };
 
-export async function fetchTripShape(tripId: string): Promise<TripShape | null> {
+export async function fetchTripShape(
+  tripId: string, 
+  acceptTripFromOtherServiceCalendar: boolean
+): Promise<TripShape | null> {
   if (!tripId) return null;
   
-  const url = new URL(`${API_BASE}/api/shapes/trip?tripId=${tripId}`);
+  const url = new URL(`${API_BASE}/api/shapes/trip`);
   url.searchParams.set("trip_id", tripId.trim());
+  url.searchParams.set("acceptTripFromOtherServiceCalendar", String(acceptTripFromOtherServiceCalendar));
 
   try {
     const res = await fetch(url.toString(), { cache: "no-store" });
@@ -86,6 +106,10 @@ export async function fetchTripShape(tripId: string): Promise<TripShape | null> 
     return null;
   }
 }
+
+// ==================================
+//              ROUTES
+// ==================================
 
 export interface AllRoutes {
   route_id: string;
@@ -109,10 +133,23 @@ export async function fetchAllRoutes(): Promise<any[]> {
   }
 }
 
+// ==================================
+//              STOPS
+// ==================================
+
+export type Stop = {
+  stop_id: string;
+  stop_name: string;
+  lat: number;
+  lon: number;
+  zone_id: string;
+  stop_url: string;
+};
+
 export async function fetchStops(routeId: string, directionId: number | null): Promise<Stop[]> {
   if (!routeId || directionId === null) return [];
 
-  const url = new URL(`${API_BASE}/api/stops`);
+  const url = new URL(`${API_BASE}/api/stops/route`);
   url.searchParams.set("route_id", routeId.trim());
   url.searchParams.set("direction_id", String(directionId));
 
@@ -125,6 +162,30 @@ export async function fetchStops(routeId: string, directionId: number | null): P
     return [];
   }
 }
+
+export async function fetchTripStops(
+  tripId: string, 
+  acceptTripFromOtherServiceCalendar: boolean
+): Promise<Stop[]> {
+  if (!tripId) return [];
+
+  const url = new URL(`${API_BASE}/api/stops/trip`);
+  url.searchParams.set("trip_id", tripId.trim());
+  url.searchParams.set("acceptTripFromOtherServiceCalendar", String(acceptTripFromOtherServiceCalendar));
+
+  try {
+    const res = await fetch(url.toString(), { cache: "no-store" });
+    if (!res.ok) return [];
+    return res.json();
+  } catch (err) {
+    console.error("Error fetching trip shape:", err, "for trip_id:", tripId);
+    return [];
+  }
+}
+
+// ==================================
+//         PLANNED STOP_TIMES
+// ==================================
 
 export type StopPlannedArrival = {
   route_id: string;
@@ -145,20 +206,6 @@ export async function fetchPlannedArrivals(stopId: string): Promise<StopPlannedA
   }
 }
 
-export async function fetchHistory(params: {
-  mode: "trip" | "route";
-  route_id: string;
-  date: string;
-  trip_id?: string;
-  start_time?: string;
-  end_time?: string;
-}): Promise<VehicleLatest[]> 
-{
-  const query = new URLSearchParams(params as any).toString();
-  const res = await fetch(`${API_BASE}/api/history?${query}`);
-  if (!res.ok) throw new Error("Failed to fetch history");
-  return res.json();
-}
 
 export async function fetchAvailableTrips(route_id: string, date: string): Promise<string[]> {
   const url = `${API_BASE}/api/history/trips-list?route_id=${route_id}&date=${date}`;
@@ -209,13 +256,55 @@ export async function fetchDailyTimetable(
 }
 
 
+// ==================================
+//          REAL STOP_TIMES
+// ==================================
+
+export type TripExecution = { 
+    trip_id: string;
+    vehicle_id: string | null;
+    real_stop_id: string | null;
+    real_arrival_time: string | null;
+    estimated_arrival_time: string | null;
+    planned_stop_id: string;
+    planned_stop_name: string;
+    planned_arrival_time: string;
+};
+
+export async function fetchTripExecution(
+  trip_id: string, 
+  date: string, 
+): Promise<TripExecution[]> {
+  const url = `${API_BASE}/api/history/trip-execution?date=${date}&trip_id=${trip_id}`;
+  console.log("Fetching trip real-time execution from:", url);
+  const res = await fetch(url);
+  
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    console.error("Trip real-time execution fetch failed:", res.status, errorData.detail);
+    throw new Error(errorData.detail || "Failed to fetch trip real-time execution");
+  }
+  return res.json();
+}
+
+// ==================================
+//             HEADSIGNS
+// ==================================
+
 export type TripOriginResponse = {
     trip_id: string;
     origin_stop_name: string;
 };
 
-export async function fetchTripOrigin(trip_id: string): Promise<TripOriginResponse> {
-  const url = `${API_BASE}/api/trips/${trip_id}/origin`;
+export async function fetchTripOrigin(
+  trip_id: string, 
+  acceptTripFromOtherServiceCalendar: boolean
+): Promise<TripOriginResponse> {
+
+  const url = new URL(`${API_BASE}/api/trips/origin`);
+  url.searchParams.set("trip_id", trip_id.trim());
+  url.searchParams.set("acceptTripFromOtherServiceCalendar", String(acceptTripFromOtherServiceCalendar));
+
   console.log("Fetching trip origin stop from:", url); // Debug the actual URL
   const res = await fetch(url);
   
@@ -249,31 +338,3 @@ export async function fetchTripOrigin(trip_id: string): Promise<TripOriginRespon
 //     return null;
 //   }
 // }
-
-
-export type TripExecution = { 
-    trip_id: string;
-    vehicle_id: string | null;
-    real_stop_id: string | null;
-    real_arrival_time: string | null;
-    estimated_arrival_time: string | null;
-    planned_stop_id: string;
-    planned_stop_name: string;
-    planned_arrival_time: string;
-};
-
-export async function fetchTripExecution(
-  trip_id: string, 
-  date: string, 
-): Promise<TripExecution[]> {
-  const url = `${API_BASE}/api/history/trip-execution?date=${date}&trip_id=${trip_id}`;
-  console.log("Fetching trip real-time execution from:", url);
-  const res = await fetch(url);
-  
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    console.error("Trip real-time execution fetch failed:", res.status, errorData.detail);
-    throw new Error(errorData.detail || "Failed to fetch trip real-time execution");
-  }
-  return res.json();
-}

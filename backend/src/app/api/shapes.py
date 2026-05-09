@@ -6,7 +6,7 @@ from app.config import settings
 router = APIRouter()
 
 @router.get("/shapes/route")
-async def get_route_shape(
+async def get_shape_by_route(
     route_id: str = Query(..., examples=["704"]), 
     direction_id: int = Query(..., examples=[0, 1]),
     variant_id: int = 0
@@ -46,32 +46,51 @@ async def get_route_shape(
     
 
 @router.get("/shapes/trip")
-async def get_trip_shape(
-    trip_id: str = Query(..., examples=["503_0_1|223|D3|T1|N8"])
+async def get_shape_by_trip(
+    trip_id: str = Query(..., examples=["503_0_1|223|D3|T1|N8"]),
+    acceptTripFromOtherServiceCalendar: bool = Query(True, description="Allow fallback shapes with other service calendars")
 ):
-    query = """
-        SELECT ST_AsGeoJSON(s.geom) 
-        FROM gtfs.shapes s
-        LEFT JOIN gtfs.trips t ON s.shape_id = t.shape_id
-        WHERE t.trip_id = %s
-        LIMIT 1;
-    """
     
+    trip_id_parts = trip_id.split("|")
+    iterations = 20 if acceptTripFromOtherServiceCalendar and len(trip_id_parts) > 2 else 1
+
     try:
         with psycopg.connect(settings.database_url) as conn:
-            with conn.cursor() as cur:
-                cur.execute(query, (trip_id, ))
-                row = cur.fetchone()
+            for offset in range(iterations):
                 
-                if not row:
-                    return {"coordinates": []}
-                
-                geojson = json.loads(row[0])
-                # Flip [lon, lat] from PostGIS to [lat, lon] for Leaflet
-                coords = [[p[1], p[0]] for p in geojson["coordinates"]]
-                
-                return {
-                    "coordinates": coords
-                }
+                if offset == 0:
+                    current_trip_id = trip_id
+                else:
+                    # Increment the service calendar ID
+                    try:
+                        new_servcal_id = int(trip_id_parts[1]) + offset
+                        current_trip_id = f"{trip_id_parts[0]}|{new_servcal_id}|{'|'.join(trip_id_parts[2:])}"
+                    except ValueError:
+                        break 
+
+                query = """
+                    SELECT ST_AsGeoJSON(s.geom) 
+                    FROM gtfs.shapes s
+                    LEFT JOIN gtfs.trips t ON s.shape_id = t.shape_id
+                    WHERE t.trip_id = %s
+                    LIMIT 1;
+                """
+
+                with conn.cursor() as cur:
+                    cur.execute(query, (current_trip_id.strip(), ))
+                    row = cur.fetchone()
+
+                    if row:
+                        geojson = json.loads(row[0])
+                        # Flip [lon, lat] from PostGIS to [lat, lon] for Leaflet
+                        coords = [[p[1], p[0]] for p in geojson["coordinates"]]
+                        return { "coordinates": coords }
+                    
+                    # If not found, we do NOTHING here so the loop continues to the next offset
+
+            # If we finish the loop without returning, nothing was found
+            raise HTTPException(status_code=404, detail="No trip shape found after checking fallbacks")
+    
     except Exception as e:
+        if isinstance(e, HTTPException): raise e
         raise HTTPException(status_code=500, detail=str(e))

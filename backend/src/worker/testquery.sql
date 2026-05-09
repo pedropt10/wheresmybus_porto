@@ -19,11 +19,11 @@ WHERE observed_at >= '2026-04-20 23:31:00'
 
 SELECT * FROM gtfs.shapes
 -- LIMIT 20
-WHERE shape_id = '205_0_1|0'
--- WHERE shape_id = '300_0_3|0';
+-- WHERE shape_id = '205_0_1|0'
+WHERE shape_id = '300_0_3|0';
 
--- SELECT * FROM gtfs.shape_stops
--- WHERE shape_id = '300_0_3|0'
+SELECT * FROM gtfs.shape_stops
+WHERE shape_id = '300_0_3|0'
 -- ORDER BY shape_dist_traveled ASC
 
 SELECT * FROM gtfs.shape_stops ss
@@ -81,5 +81,6 @@ WHERE t.trip_id = '205_0_1|223|D3|T1|N15'
 -- END
 -- WHERE direction_id IN (1, 2, 3);
 
--- SELECT * FROM gtfs.trips
+SELECT * FROM gtfs.trips
+WHERE route_id = '303'
 -- WHERE trip_id = '205_0_2|220|D2|T3|N9'

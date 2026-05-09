@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { fetchAllRoutes, fetchAvailableTrips, fetchHistory, fetchStops, fetchTripShape, fetchTripOrigin, fetchTripExecution,
-type AllRoutes, type VehicleLatest, type TripShape, type TripOriginResponse, type TripExecution, type Stop, } from "../api/client";
+import { fetchAllRoutes, fetchAvailableTrips, fetchHistory, fetchTripExecution, fetchTripShape, fetchTripStops, fetchTripOrigin, 
+type AllRoutes, type VehicleLatest, type TripShape, type TripOriginResponse, type TripExecution, type Stop } from "../api/client";
 import { HistoryMap } from "../components/HistoryMap";
 import { TripSpine } from "../components/HistorySpine";
 import { getRouteColors, getDirectionDestination } from "../components/Map";
@@ -49,7 +49,7 @@ export function HistoryPage() {
       alert(`Please select ${activeTab === "trip" ? "both a Route and a Trip" : "a Route"} before searching!`);
       return; // Exit function early
     }
-     // Clear the map immediately, as well as the trip origin and the execution data
+     // Reset UI state. Clear the map immediately, as well as the trip origin and the execution data.
     setHistoryData([]);
     setTripOrigin([]);
     setTripExecution([]);
@@ -69,41 +69,47 @@ export function HistoryPage() {
       
       // 2. Fetch Trip Shape
       if (selectedTrip) {
-        const shapeData = await fetchTripShape(selectedTrip);
+        const shapeData = await fetchTripShape(selectedTrip, true);
         setShape(shapeData);
-        const data = await fetchStops(selectedRoute, 0);
-        setStops(data);
-        // DIRECTION TEMPORARILY SET AS ZER O
-        // Must be modified to get the stops via the shape_id 
+
+        let shapeDirection = 0;
+
+        const tripIdShapePrefix = selectedTrip.split("|")[0];
+        // First part of tripId is 205_0_1, 205_0_2, ... Last number is the direction + 1.
+        // For circulars like 300_0_3, direction is 0 
+        // If not found or unexpected format, default to 0
+        const parsedDirection = parseInt(tripIdShapePrefix.split("_").at(-1) || "1");
+        if ((parsedDirection == 1) || (parsedDirection == 2)) {
+          shapeDirection = parsedDirection - 1; // Convert to zero-based index
+        } else if (parsedDirection == 3) {
+          shapeDirection = 0; // Set to 0 for direction 3
+        } else {
+          shapeDirection = 0; // Default if parsing fails or if direction is not in expected format
+        }
+
+        const stopsData = await fetchTripStops(selectedTrip, true);
+        setStops(stopsData);
+
+        const origin = await fetchTripOrigin(selectedTrip, true);
+        setTripOrigin([origin]);
+
+        const exec = await fetchTripExecution(selectedTrip, selectedDate);
+        setTripExecution(exec);
+
       }
 
       // 3. Fetch Route Colors
       if (selectedRoute) {
         const selectedRouteColors = getRouteColors(selectedRoute, 0);
-          setRouteColors({
-            bgColor: selectedRouteColors.bgColor || 'transparent',
-            textColor: selectedRouteColors.textColor || '(var--text-main)'
-          });
+        setRouteColors({
+          bgColor: selectedRouteColors.bgColor || 'transparent',
+          textColor: selectedRouteColors.textColor || 'var--(text-main)'
+        });
       }
-
-      // 4. Fetch Trip Context (Origin and Spine Execution)
-      if (selectedTrip) {
-        // Run these in parallel to save time
-        const [origin, exec] = await Promise.all([
-          fetchTripOrigin(selectedTrip),
-          fetchTripExecution(selectedTrip, selectedDate)
-        ]);
-        
-        setTripOrigin([origin]);
-        setTripExecution(exec);
-      }
-      // if (selectedTrip) {
-      //   const tripOrigin = await fetchTripOrigin(selectedTrip);
-      //   setTripOrigin([tripOrigin]);
-      // }
 
     } catch (e) {
-      alert("Search failed");
+      console.error("Search error:", e);
+      alert("Search failed. Please check your connection.");
     } finally {
       setLoading(false);
     }

@@ -17,6 +17,7 @@ class VehicleHistory(BaseModel):
     trip_headsign: Optional[str]
     lat: float
     lon: float
+    heading: int
     last_stop_id: Optional[str]
     last_stop_name: Optional[str]
     cur_stop_id: Optional[str]
@@ -48,7 +49,7 @@ async def get_vehicle_history(
                 base_sql = """
                     SELECT 
                         o.vehicle_id, o.observed_at, o.route_id, o.direction, o.trip_id, t.trip_headsign,
-                        ST_Y(o.geom::geometry) as lat, ST_X(o.geom::geometry) as lon,
+                        ST_Y(o.geom::geometry) as lat, ST_X(o.geom::geometry) as lon, o.heading,
                         o.last_stop_id, s.stop_name, o.cur_stop_id, r.route_short_name, r.route_long_name
                     FROM bus.vehicle_observation o
                     LEFT JOIN gtfs.routes r ON o.route_id = r.route_id
@@ -81,11 +82,12 @@ async def get_vehicle_history(
                         trip_headsign=row[5],
                         lat=row[6],
                         lon=row[7],
-                        last_stop_id=row[8],
-                        last_stop_name=row[9],
-                        cur_stop_id=row[10],
-                        route_short_name=row[11],
-                        route_long_name=row[12]
+                        heading=row[8],
+                        last_stop_id=row[9],
+                        last_stop_name=row[10],
+                        cur_stop_id=row[11],
+                        route_short_name=row[12],
+                        route_long_name=row[13]
                     ) for row in rows
                 ]
 
