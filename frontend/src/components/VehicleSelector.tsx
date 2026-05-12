@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { getRouteColors } from "./Map";
 import { AllRoutes } from "../api/client";
+import { useLanguage } from "../context/LanguageContext";
 
 type Props = {
   route: string;
@@ -25,6 +26,8 @@ export function VehicleSelector({
   lastUpdated,
   mostRecentLocation
 }: Props) {
+  const { t } = useLanguage();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [isListOpen, setIsListOpen] = useState(false);
   
@@ -51,7 +54,7 @@ export function VehicleSelector({
     <div style={styles.bar}>
       <div style={styles.left}>
         <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-          <span style={{ fontSize: 14 }}>Route:&nbsp;</span>
+          <span style={{ fontSize: 14 }}>{t("gen_route")}:&nbsp;</span>
           <div style={{ 
             position: "relative",  display: "flex", alignItems: "center",
             background: "var(--bg-input-select)", border: "1px solid var(--border-color)", borderRadius: 4,
@@ -59,7 +62,7 @@ export function VehicleSelector({
           }} 
           onClick={() => setIsListOpen(true)}>
             
-            {/* 1. Selected route box (Visible when list is closed and route is selected) */}
+            {/* SELECTED ROUTE BOX (Visible when list is closed and route is selected) */}
             {!isListOpen && selectedRouteObj && (
               <span style={{ 
                 backgroundColor: bgColor, color: textColor, padding: "2px 6px", 
@@ -69,7 +72,7 @@ export function VehicleSelector({
               </span>
             )}
 
-            {/* 2. THE SEARCH INPUT */}
+            {/* SEARCH INPUT */}
             <input
               value={isListOpen ? searchTerm : (selectedRouteObj ? "" : route)}
               onFocus={() => {
@@ -78,7 +81,7 @@ export function VehicleSelector({
               }}
               onBlur={() => setTimeout(() => setIsListOpen(false), 200)}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={!selectedRouteObj ? "Search..." : ""}
+              placeholder={!selectedRouteObj ? t("gen_searching") : ""}
               style={{ 
                 border: "none", outline: "none", 
                 width: isListOpen ? "100%" : 60, // Shrink when showing the pill
@@ -95,7 +98,7 @@ export function VehicleSelector({
             }}
             onBlur={() => setTimeout(() => setIsListOpen(false), 200)} // Delay so click registers
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search..."
+            placeholder={t("gen_searching")}
             style={{ ...styles.input, width: 120 }} 
           /> */}
 
@@ -108,8 +111,7 @@ export function VehicleSelector({
                   setSearchTerm("");
                 }}
                 style={{ ...styles.dropdownItem, fontWeight: 'regular', color: '#555' }}
-              >(All routes)
-              </div>
+              >{t("selector_allroutes")}</div>
               {filteredRoutes.map((r) => {
                 const { bgColor, textColor } = getRouteColors(r.route_id, 0);
                 return (
@@ -146,7 +148,7 @@ export function VehicleSelector({
           />
         </label> */}
         <label style={styles.label}>
-          Direction:&nbsp;
+          {t("gen_direction")}:&nbsp;
           <select
             value={direction === null ? "all" : String(direction)}
             onChange={(e) => {
@@ -155,23 +157,23 @@ export function VehicleSelector({
             }}
             style={styles.select}
           >
-            <option value="all">All</option>
-            <option value="0">0 (Inbound)</option>
-            <option value="1">1 (Outbound)</option>
+            <option value="all">{t("selector_alldirections")}</option>
+            <option value="0">{t("selector_0inbound")}</option>
+            <option value="1">{t("selector_1outbound")}</option>
           </select>
         </label>
 
         <button onClick={onRefreshNow} style={styles.button}>
-          Refresh
+          {t("selector_refresh")}
         </button>
       </div>
 
       <div style={styles.right}>
         {mostRecentLocation && (
-          <span style={{ ...styles.muted, marginRight: 15 }}>Most recent location: <b>{mostRecentLocation}</b></span>
+          <span style={{ ...styles.muted, marginRight: 15 }}>{t("selector_mostrecentlocation")} <b>{mostRecentLocation}</b></span>
         )}
         {lastUpdated ? (
-          <span style={styles.muted}>Last map update: {lastUpdated}</span>
+          <span style={styles.muted}>{t("selector_lastmapupdate")} {lastUpdated}</span>
         ) : null}
       </div>
     </div>

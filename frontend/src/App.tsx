@@ -5,6 +5,39 @@ import { MapPage } from "./pages/MapPage";
 import { StatsPage } from "./pages/StatsPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { TimetablesPage } from "./pages/TimetablesPage";
+import { LanguageProvider, useLanguage } from "./context/LanguageContext";
+
+function Navigation({ isDark, setIsDark }: { isDark: boolean; setIsDark: (v: boolean) => void }) {
+  const { t, lang, setLanguage } = useLanguage();
+
+  return (
+    <div style={styles.nav}>
+      <div style={styles.brand}>{t('appname')}</div>
+      <div style={styles.links}>
+        <Link style={styles.link} to="/">{t('pagetitle_map')}</Link>
+        <Link style={styles.link} to="/timetables">{t('pagetitle_timetables')}</Link>
+        <Link style={styles.link} to="/history">{t('pagetitle_history')}</Link>
+        <Link style={styles.link} to="/stats">{t('pagetitle_stats')}</Link>
+
+        {/* Language Toggle Button */}
+        <button 
+          onClick={() => setLanguage(lang === 'en' ? 'pt' : 'en')}
+          style={styles.toggleBtn}
+        >
+          {lang === 'en' ? 'PT' : 'EN'}
+        </button>
+
+        {/* Theme Toggle Button */}
+        <button 
+          onClick={() => setIsDark(!isDark)}
+          style={styles.toggleBtn}
+        >
+          {isDark ? "☀️" : "🌙"}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export function App() {
   const [isDark, setIsDark] = useState(() => 
@@ -18,39 +51,19 @@ export function App() {
   }, [isDark]);
 
   return (
-    <BrowserRouter>
-      <div style={styles.nav}>
-        <div style={styles.brand}>Bus Tracker</div>
-        <div style={styles.links}>
-          <Link style={styles.link} to="/">
-            Map
-          </Link>
-          <Link style={styles.link} to="/stats">
-            Stats
-          </Link>
-          <Link style={styles.link} to="/history">
-            History
-          </Link>
-          <Link style={styles.link} to="/timetables">
-            Timetables
-          </Link>
+    // 2. Wrap everything in LanguageProvider
+    <LanguageProvider>
+      <BrowserRouter>
+        <Navigation isDark={isDark} setIsDark={setIsDark} />
 
-          <button 
-            onClick={() => setIsDark(!isDark)}
-            style={styles.toggleBtn}
-          >
-            {isDark ? "☀️" : "🌙"}
-          </button>
-        </div>
-      </div>
-
-      <Routes>
-        <Route path="/" element={<MapPage />} />
-        <Route path="/stats" element={<StatsPage />} />
-        <Route path="/history" element={<HistoryPage />} />
-        <Route path="/timetables" element={<TimetablesPage />} />
-      </Routes>
-    </BrowserRouter>
+        <Routes>
+          <Route path="/" element={<MapPage />} />
+          <Route path="/timetables" element={<TimetablesPage />} />
+          <Route path="/history" element={<HistoryPage />} />
+          <Route path="/stats" element={<StatsPage />} />
+        </Routes>
+      </BrowserRouter>
+    </LanguageProvider>
   );
 }
 
@@ -79,6 +92,7 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: "4px",
     cursor: "pointer",
     padding: "4px 8px",
-    fontSize: "16px"
+    color: "var(--text-secondary)",
+    fontSize: "14px"
   }
 };

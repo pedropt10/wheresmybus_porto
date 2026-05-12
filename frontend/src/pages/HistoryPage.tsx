@@ -4,6 +4,7 @@ type AllRoutes, type VehicleLatest, type TripShape, type TripOriginResponse, typ
 import { HistoryMap } from "../components/HistoryMap";
 import { TripSpine } from "../components/HistorySpine";
 import { getRouteColors, getDirectionDestination } from "../components/Map";
+import { useLanguage } from "../context/LanguageContext";
 
 type Tab = "trip" | "route";
 
@@ -28,6 +29,8 @@ export function HistoryPage() {
   const [loading, setLoading] = useState(false);
   const [selectedRouteColors, setRouteColors] = useState({ bgColor: 'transparent', textColor: 'inherit' });
 
+  const { t } = useLanguage();
+
   useEffect(() => {
     fetchAllRoutes().then(setAllRoutes).catch(console.error);
   }, []);
@@ -46,7 +49,7 @@ export function HistoryPage() {
 
   const handleSearch = async () => {
     if (!selectedRoute || (activeTab === "trip" && !selectedTrip)) {
-      alert(`Please select ${activeTab === "trip" ? "both a Route and a Trip" : "a Route"} before searching!`);
+      alert(activeTab === "trip" ? t("alert_history_select_route_and_trip") : t("alert_history_select_route_only"));
       return; // Exit function early
     }
      // Reset UI state. Clear the map immediately, as well as the trip origin and the execution data.
@@ -109,7 +112,7 @@ export function HistoryPage() {
 
     } catch (e) {
       console.error("Search error:", e);
-      alert("Search failed. Please check your connection.");
+      alert(t("alert_search_failed"));
     } finally {
       setLoading(false);
     }
@@ -122,33 +125,33 @@ export function HistoryPage() {
         <button 
           onClick={() => setActiveTab("trip")}
           style={tabStyle(activeTab === "trip")}
-        >🔍 Trip Search</button>
+        >🔍 {t("history_trip_search")}</button>
         <button 
           onClick={() => setActiveTab("route")}
           style={tabStyle(activeTab === "route")}
-        >🛤️ Route Search [WIP]</button>
+        >🛤️ {t("history_route_search")}</button>
       </div>
 
       {/* Search Controls */}
       <div style={{ padding: "15px", display: "flex", gap: "10px", flexWrap: "wrap", 
         alignItems: "flex-end", background: "var(--bg-sub-header)", borderBottom: "1px solid var(--border-color)" }}>
         <div className="field">
-          <label style={labelStyle}>Route</label>
+          <label style={labelStyle}>{t("gen_route")}</label>
           <select value={selectedRoute} onChange={(e) => {
             setSelectedRoute(e.target.value); 
             setSelectedTrip(""); // Reset the trip whenever the route changes
           }} style={inputStyle}>
-            <option value="">Select Route</option>
+            <option value="">{t("history_route_select")}</option>
             {allRoutes.map(r => <option key={r.route_id} value={r.route_id}>{r.route_short_name}</option>)}
           </select>
         </div>
 
         {activeTab === "trip" ? (
           <div className="field">
-            <label style={labelStyle}>Trip ID</label>
+            <label style={labelStyle}>{t("history_trip_id")}</label>
             <select value={selectedTrip} onChange={(e) => setSelectedTrip(e.target.value)} style={inputStyle} disabled={availableTrips.length === 0}>
                 <option value="" hidden={!!selectedTrip}>
-                    {availableTrips.length > 0 ? "Select a Trip" : "No trips found for this day"}
+                    {availableTrips.length > 0 ? t("history_trip_select") : t("history_trip_notripsfound")}
                 </option>
                 {availableTrips.map(tid => (
                     <option key={tid} value={tid}>{tid}</option>
@@ -158,23 +161,23 @@ export function HistoryPage() {
         ) : (
           <>
             <div className="field">
-              <label style={labelStyle}>Start Time</label>
+              <label style={labelStyle}>{t("history_start_time")}</label>
               <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} style={inputStyle} />
             </div>
             <div className="field">
-              <label style={labelStyle}>End Time</label>
+              <label style={labelStyle}>{t("history_end_time")}</label>
               <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} style={inputStyle} />
             </div>
           </>
         )}
 
         <div className="field">
-          <label style={labelStyle}>Date</label>
+          <label style={labelStyle}>{t("gen_date")}</label>
           <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} style={inputStyle} />
         </div>
 
         <button onClick={handleSearch} disabled={loading} style={searchButtonStyle}>
-          {loading ? "Searching..." : "Search History"}
+          {loading ? t("gen_searching") : t("history_search_btn")}
         </button>
       </div>
 

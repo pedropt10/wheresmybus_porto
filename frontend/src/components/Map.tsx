@@ -3,6 +3,7 @@ import React, { useMemo, useEffect, useState } from "react";
 import L from 'leaflet'; // Import Leaflet for custom icons
 import { MapContainer, TileLayer, Popup, Polyline, CircleMarker, Marker, Pane } from "react-leaflet";
 import type { VehicleLatest, RouteShape, Stop } from "../api/client";
+import { useLanguage } from "../context/LanguageContext";
 
 type Props = {
   vehicles: VehicleLatest[];
@@ -74,7 +75,6 @@ export function getDirectionDestination(longName: string | null, direction: numb
   // 2. Remove the "via" parts from the original string to clean up the destinations
   let cleanLongName = longName.replace(viaRegex, "").trim();
 
-
   let destination: string; 
 
   if (isCircular) {
@@ -97,6 +97,9 @@ export function getDirectionDestination(longName: string | null, direction: numb
 }
 
 export function Map({ vehicles, shapeData0, shapeData1, selectedRoute, selectedDirection, stops }: Props) {
+
+  const { t } = useLanguage();
+  
   // Colors for primary shape (Direction 0 or currently selected)
   const primaryColors = useMemo(() => 
     getRouteColors(selectedRoute, selectedDirection === null ? 0 : selectedDirection), 
@@ -142,15 +145,15 @@ export function Map({ vehicles, shapeData0, shapeData1, selectedRoute, selectedD
       fetchArrivals();
     }, [stopId]);
 
-    if (loading) return <div style={{ padding: "10px", textAlign: "center" }}>Loading...</div>;
-    if (arrivals.length === 0) return <div style={{ padding: "10px", fontSize: "12px" }}>No upcoming arrivals.</div>;
+    if (loading) return <div style={{ padding: "10px", textAlign: "center" }}>{t("gen_loading")}</div>;
+    if (arrivals.length === 0) return <div style={{ padding: "10px", fontSize: "12px" }}>{t("map_stop_noarrivals")}</div>;
 
     return (
       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "8px", fontSize: "12px" }}>
         <thead>
           <tr style={{ borderBottom: "1px solid var(--border-color)", textAlign: "left", color: "var(--text-secondary)" }}>
-            <th style={{ padding: "4px", textAlign: "center" }}>Route</th>
-            <th style={{ padding: "4px", textAlign: "left" }}>Destination</th>
+            <th style={{ padding: "4px", textAlign: "center" }}>{t("gen_route")}</th>
+            <th style={{ padding: "4px", textAlign: "left" }}>{t("gen_destination")}</th>
             <th style={{ padding: "4px", textAlign: "center" }}>🕒</th>
           </tr>
         </thead>
@@ -354,7 +357,7 @@ export function Map({ vehicles, shapeData0, shapeData1, selectedRoute, selectedD
                     display: "block", borderTop: "1px solid var(--border-color)", paddingTop: "5px"
                   }}
                 >
-                  View Timetables →
+                  {t("map_view_timetables")}
                 </a>
               )}
             </div>
@@ -507,8 +510,8 @@ export function Map({ vehicles, shapeData0, shapeData1, selectedRoute, selectedD
               >
                 <Popup pane="popup-pane" minWidth={100}>
                   <div style={{ fontSize: 13, minWidth: "100px", whiteSpace: "nowrap" }}>
-                    <div>⬜ PREVIOUS</div>
-                    <div>⬜ LOCATION</div><br></br>
+                    <div>⬜ {t("map_location_previous")}</div>
+                    <div>⬜ {t("map_location")}</div><br></br>
                     <div><span style={{ 
                       backgroundColor: routeMainBgColor, color: routeMainTextColor, 
                       padding: "2px 6px", borderRadius: 4, minWidth: 20,
@@ -536,7 +539,7 @@ export function Map({ vehicles, shapeData0, shapeData1, selectedRoute, selectedD
             >
               <Popup pane="popup-pane" minWidth={100}>
                 <div style={{ fontSize: 13, minWidth: "100px", whiteSpace: "nowrap" }}>
-                  <div><b>{isOld ? "🔴 LAGGING " : "🟢 LIVE "}</b>({new Date(v.observed_at).toLocaleTimeString('pt-PT', { 
+                  <div><b>{isOld ? "🔴 " + t("map_ping_lagging") + " " : "🟢 " + t("map_ping_live") + " "}</b>({new Date(v.observed_at).toLocaleTimeString('pt-PT', { 
                           hour: '2-digit', minute: '2-digit', second: '2-digit' 
                         })})</div><br></br>
                   <div><span style={{ 
@@ -552,16 +555,16 @@ export function Map({ vehicles, shapeData0, shapeData1, selectedRoute, selectedD
                   {/* If current stop is available, display it. Else, display the estimated last stop. */}
                   {v.cur_stop_id ? (
                     <>
-                      <div><b>🚏 Current stop:</b></div>
-                      <div>{v.last_stop_name ?? v.cur_stop_id ?? "(not available)"}</div>
+                      <div><b>🚏 {t("map_current_stop")}</b></div>
+                      <div>{v.last_stop_name ?? v.cur_stop_id ?? t("gen_na")}</div>
                     </>
                   ) : (
                     <>
-                      <div><b>🚏 Last stop:</b></div>
-                      <div>{v.last_stop_name ?? v.last_stop_id ?? "(not available)"}</div>
+                      <div><b>🚏 {t("map_last_stop")}</b></div>
+                      <div>{v.last_stop_name ?? v.last_stop_id ?? t("gen_na")}</div>
                     </>
                   )}
-                  {/* <div><b>Destination:</b>{v.trip_headsign ?? "(not available)"}</div> */}
+                  {/* <div><b>Destination:</b>{v.trip_headsign ?? t("gen_na")}</div> */}
                 </div>
               </Popup>
             </Marker>

@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Popup, Polyline, CircleMarker, useMap, Pane, M
 import type { VehicleLatest, TripShape, Stop } from "../api/client";
 // Reuse your existing color logic
 import { getRouteColors, getDirectionDestination } from "./Map"; 
+import { useLanguage } from "../context/LanguageContext";
 
 type Props = {
   vehicles: VehicleLatest[];
@@ -41,7 +42,9 @@ export function HistoryMap({ vehicles, shapeData, selectedRoute, stops }: Props)
     [selectedRoute]
   );
 
-  // WIP: Custom bus icon
+  const { t } = useLanguage();
+
+  // Custom bus icon
   const getCustomIcon = (idx: number, total: number, bgColor: string, textColor: string, heading: number) => {
     const isSpecial = idx === 0 || idx === total - 1;
     let busIconFillColor = "white";
@@ -120,7 +123,7 @@ export function HistoryMap({ vehicles, shapeData, selectedRoute, stops }: Props)
       <Pane name="history-pings-pane" style={{ zIndex: 450 }} />
       <Pane name="popup-pane" style={{ zIndex: 700 }} />
 
-      {/* I. STATIC ROUTE SHAPE (Context) */}
+      {/* STATIC ROUTE SHAPE (Context) */}
       {shapeData && (
         <Polyline
           positions={shapeData.coordinates}
@@ -133,7 +136,7 @@ export function HistoryMap({ vehicles, shapeData, selectedRoute, stops }: Props)
         />
       )}
 
-      {/* II. HISTORICAL BREADCRUMB LINE */}
+      {/* HISTORICAL BREADCRUMB LINE */}
       {historyPositions.length > 1 && (
         <>
           {/* Shadow effect if the route type usually has one */}
@@ -141,27 +144,20 @@ export function HistoryMap({ vehicles, shapeData, selectedRoute, stops }: Props)
             <Polyline
               positions={historyPositions}
               pathOptions={{
-                color: "#000",
-                weight: 7,
-                opacity: 0.2,
-                pane: "history-path-pane",
+                color: "#000", weight: 4, opacity: 0.2, pane: "history-path-pane"
               }}
             />
           )}
           <Polyline
             positions={historyPositions}
             pathOptions={{
-              color: bgColor,
-              weight: 4,
-              opacity: 0.8,
-              lineJoin: "round",
-              pane: "history-path-pane",
+              color: bgColor, weight: 2, opacity: 0.8, lineJoin: "round", pane: "history-path-pane",
             }}
           />
         </>
       )}
 
-      {/* III. STOPS */}
+      {/* STOPS */}
       {stops.map((stop: Stop) => (
         <CircleMarker
           key={stop.stop_id}
@@ -185,7 +181,7 @@ export function HistoryMap({ vehicles, shapeData, selectedRoute, stops }: Props)
         </CircleMarker>
       ))}
 
-      {/* IV. INDIVIDUAL GPS PINGS */}
+      {/* INDIVIDUAL GPS PINGS */}
       {vehicles.map((v, idx) => {
         const timeStr = new Date(v.observed_at).toLocaleTimeString("pt-PT", {
           hour: "2-digit",
@@ -216,7 +212,7 @@ export function HistoryMap({ vehicles, shapeData, selectedRoute, stops }: Props)
             <Popup pane="popup-pane">
               <div style={{ fontSize: "13px", minWidth: "140px" }}>
                 <div style={{ marginBottom: "5px", borderBottom: "1px solid #eee", paddingBottom: "3px" }}>
-                   <strong>Historical Ping</strong>
+                   <strong>{t("map_ping")}</strong>
                 </div>
                 
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
@@ -230,20 +226,20 @@ export function HistoryMap({ vehicles, shapeData, selectedRoute, stops }: Props)
                 </div>
 
                 <div style={{ fontSize: "12px" }}>
-                  <div>🚌 <b>Vehicle:</b> {v_label}</div>
+                  <div>🚌 <b>{t("gen_vehicle")}:</b> {v_label}</div>
                   {(v.cur_stop_id && v.last_stop_id) && (
                     <div style={{ marginTop: "4px", color: "var(--text-secondary)" }}>
-                      🚏 <b>At stop:</b> {v.last_stop_name}
+                      🚏 <b>{t("map_at_stop")}:</b> {v.last_stop_name}
                     </div>
                   )}
                   {(!v.cur_stop_id && v.last_stop_id) && (
                     <div style={{ marginTop: "4px", color: "var(--text-secondary)" }}>
-                      🚏 <b>Near:</b> {v.last_stop_name}
+                      🚏 <b>{t("map_near")}:</b> {v.last_stop_name}
                     </div>
                   )}
-                  <div style={{ marginTop: "4px", color: "var(--text-secondary)" }}>
-                    🚏 <b>Heading:</b> {v.heading}
-                  </div>
+                  {/* <div style={{ marginTop: "4px", color: "var(--text-secondary)" }}>
+                    🚏 <b>{t("map_heading")}:</b> {v.heading}
+                  </div> */}
                 </div>
               </div>
             </Popup>
@@ -251,7 +247,7 @@ export function HistoryMap({ vehicles, shapeData, selectedRoute, stops }: Props)
         );
       })}
 
-      {/* IV. AUTO-FOCUS LOGIC */}
+      {/* AUTO-FOCUS LOGIC */}
       <FitBounds positions={historyPositions} />
     </MapContainer>
   );
