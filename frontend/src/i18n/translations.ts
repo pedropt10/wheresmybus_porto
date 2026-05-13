@@ -13,6 +13,7 @@ export const translations = {
     gen_na: "(not available)",
     gen_route: "Route",
     gen_searching: "Searching...",
+    gen_stop: "Stop",
     gen_trip: "Trip",
     gen_vehicle: "Vehicle",
 
@@ -51,7 +52,14 @@ export const translations = {
     selector_1outbound: "1 (Outbound)",
     selector_refresh: "Refresh",
     selector_mostrecentlocation: "Most recent location:",
-    selector_lastmapupdate: "Last map update:"
+    selector_lastmapupdate: "Last map update:",
+
+    timetables_placeholder: "Select a Route and date to view the scheduled timetable.",
+    timetables_route_search: "Search by Route",
+    timetables_search: "Search Timetables",
+    timetables_select_route: "Select Route",
+    timetables_select_stop: "Select Stop",
+    timetables_stop_search: "Search by Stop [WIP]"
   },
   pt: {
     alert_history_select_route_only: "Por favor, selecione uma Linha antes de pesquisar!",
@@ -68,6 +76,7 @@ export const translations = {
     gen_na: "(não disponível)",
     gen_route: "Linha",
     gen_searching: "A pesquisar...",
+    gen_stop: "Paragem",
     gen_trip: "Viagem",
     gen_vehicle: "Veículo",
 
@@ -101,12 +110,19 @@ export const translations = {
     pagetitle_timetables: "Horários",
 
     selector_allroutes: "(Todas as linhas)",
-    selector_alldirections: "Todos os sentidos",
+    selector_alldirections: "Todos",
     selector_0inbound: "0 (Ida)",
     selector_1outbound: "1 (Volta)",
     selector_refresh: "Recarregar",
     selector_mostrecentlocation: "Última localização:",
-    selector_lastmapupdate: "Última atualização do mapa:"
+    selector_lastmapupdate: "Última atualização do mapa:",
+
+    timetables_placeholder: "Escolha uma Linha e uma Data para ver o horário planeado.",
+    timetables_route_search: "Pesquisa por Linha",
+    timetables_search: "Pesquisar Horários",
+    timetables_select_route: "Escolha uma Linha",
+    timetables_select_stop: "Escolha uma Paragem",
+    timetables_stop_search: "Pesquisa por Paragem [WIP]"
   }
 };
 

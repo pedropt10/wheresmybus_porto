@@ -81,7 +81,7 @@ export function VehicleSelector({
               }}
               onBlur={() => setTimeout(() => setIsListOpen(false), 200)}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={!selectedRouteObj ? t("gen_searching") : ""}
+              placeholder={!selectedRouteObj ? "..." : ""}
               style={{ 
                 border: "none", outline: "none", 
                 width: isListOpen ? "100%" : 60, // Shrink when showing the pill

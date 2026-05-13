@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { fetchAllRoutes, type AllRoutes, fetchDailyTimetable, type TimetableResponse } from "../api/client";
 import { Timetable } from "../components/Timetable";
 import { getRouteColors } from "../components/Map";
+import { useLanguage } from "../context/LanguageContext";
 
 type Tab = "routeTab" | "stop";
 
@@ -33,6 +34,8 @@ export function TimetablesPage() {
       r.route_short_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [searchTerm, allRoutes]);
+
+  const { t } = useLanguage();
 
   // Results
   const [timetable, setTimetable] = useState<TimetableResponse | null>(null);
@@ -70,11 +73,11 @@ export function TimetablesPage() {
         <button 
           onClick={() => setActiveTab("routeTab")}
           style={tabStyle(activeTab === "routeTab")}
-        >🔍 Route Search</button>
+        >🔍 {t("timetables_route_search")}</button>
         <button 
           onClick={() => setActiveTab("stop")}
           style={tabStyle(activeTab === "stop")}
-        >🚏 Stop Search (WIP)</button>
+        >🚏 {t("timetables_stop_search")}</button>
       </div>
 
       {/* Search Controls */}
@@ -82,37 +85,37 @@ export function TimetablesPage() {
       <div style={{ padding: "15px", display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "flex-end", background: "var(--bg-sub-header)" }}>
         {activeTab === "routeTab" ? (
             <div className="field">
-              <label style={styles.label}>Route | Direction</label>
+              <label style={styles.label}>{t("gen_route")} | {t("gen_direction")}</label>
               <select value={selectedRoute} onChange={(e) => setSelectedRoute(e.target.value)} style={styles.input}>
-                  <option value="">Select Route</option>
+                  <option value="">{t("timetables_select_route")}</option>
                   {allRoutes.map(r => <option key={r.route_id} value={r.route_id}>{r.route_short_name}</option>)}
               </select>
                                 
               <label> </label>
               {/* <label style={styles.label}>Dir.</label> */}
               <select value={selectedDirection} onChange={(e) => setSelectedDirection(Number(e.target.value))} style={styles.input}>
-                  <option value={0}>0 (Inbound)</option>
-                  <option value={1}>1 (Outbound)</option>
+                  <option value={0}>{t("selector_0inbound")}</option>
+                  <option value={1}>{t("selector_1outbound")}</option>
               </select>
             </div>
         ) : (
             // WORK IN PROGRESS
             <div className="field">
-            <label style={styles.label}>Stop</label>
+            <label style={styles.label}>{t("gen_stop")}</label>
             <select value={selectedRoute} onChange={(e) => setSelectedRoute(e.target.value)} style={styles.input}>
-                <option value="">Select Stop</option>
+                <option value="">{t("timetables_select_stop")}</option>
                 {allRoutes.map(r => <option key={r.route_id} value={r.route_id}>{r.route_short_name}</option>)}
             </select>
             </div>
         )}
 
         <div className="field">
-          <label style={styles.label}>Date</label>
+          <label style={styles.label}>{t("gen_date")}</label>
           <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} style={styles.input} />
         </div>
 
         <button onClick={handleSearchSchedules} disabled={loading} style={styles.button}>
-          {loading ? "Searching..." : "Search Timetables"}
+          {loading ? t("gen_searching") : t("timetables_search")}
         </button>
       </div>
 
@@ -124,7 +127,7 @@ export function TimetablesPage() {
         ) : (
           !loading && (
             <div style={{ textAlign: "center", color: "#666", marginTop: "40px" }}>
-              Select a Route and date to view the scheduled timetable.
+              {t("timetables_placeholder")}
             </div>
           )
         )}

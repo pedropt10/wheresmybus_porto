@@ -93,23 +93,23 @@ export function MapPage() {
     loadStops();
   }, [route, direction]);
 
-  const header = useMemo(() => {
-    const n = vehicles.length;
+  // const header = useMemo(() => {
+  //   const n = vehicles.length;
     
-    let directionLabel;
-      if (direction === 0) {
-        directionLabel = '0 (Inbound)';
-      } else if (direction === 1) {
-        directionLabel = '1 (Outbound)';
-      } else {
-        directionLabel = "(all)";
-      }
+  //   let directionLabel;
+  //     if (direction === 0) {
+  //       directionLabel = '0 (Inbound)';
+  //     } else if (direction === 1) {
+  //       directionLabel = '1 (Outbound)';
+  //     } else {
+  //       directionLabel = "(all)";
+  //     }
 
-    const d = direction === null ? "all" : String(direction);
-    const routeDisplay = route === "" || !route ? "(all)" : route;
+  //   const d = direction === null ? "all" : String(direction);
+  //   const routeDisplay = route === "" || !route ? "(all)" : route;
     
-    return `${n} vehicle${n === 1 ? "" : "s"} | route ${route || "(all)"} | direction ${directionLabel}`;
-  }, [vehicles.length, route, direction]);
+  //   return `${n} vehicle${n === 1 ? "" : "s"} | route ${route || "(all)"} | direction ${directionLabel}`;
+  // }, [vehicles.length, route, direction]);
 
   const mostRecentLocationTime = useMemo(() => {
     if (!vehicles || vehicles.length === 0) return undefined; 
@@ -146,11 +146,11 @@ export function MapPage() {
         mostRecentLocation={mostRecentLocationTime}
         allRoutes={allRoutes}
       />
-      <div style={{ padding: "4px 12px", fontSize: 13, borderBottom: "1px solid var(--border-color)", 
+      {/* <div style={{ padding: "4px 12px", fontSize: 13, borderBottom: "1px solid var(--border-color)", 
                     background: "var(--bg-sub-header)", color: "var(--text-main)" }}>
         <b>{header}</b>
         {error && <span style={{ marginLeft: 10, color: "crimson" }}>{error}</span>}
-      </div>
+      </div> */}
       <div style={{ flex: 1, position: "relative" }}>
         <Map vehicles={vehicles} shapeData0={shapeData0} shapeData1={shapeData1} stops={stops} 
         selectedRoute={route} selectedDirection={direction} />
