@@ -73,3 +73,4 @@ def get_latest_by_fleet_id(vehicle_id: str):
         with conn.cursor() as cur:
             cur.execute(sql, {"vehicle_id": vehicle_id})
             return cur.fetchone()
+        

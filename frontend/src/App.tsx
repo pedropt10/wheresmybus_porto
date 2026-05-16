@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import { MapPage } from "./pages/MapPage";
 // import { StatsPage } from "./pages/StatsPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { FleetPage } from "./pages/FleetPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { TimetablesPage } from "./pages/TimetablesPage";
 import { LanguageProvider, useLanguage } from "./context/LanguageContext";
@@ -17,6 +19,8 @@ function Navigation({ isDark, setIsDark }: { isDark: boolean; setIsDark: (v: boo
         <Link style={styles.link} to="/">{t('pagetitle_map')}</Link>
         <Link style={styles.link} to="/timetables">{t('pagetitle_timetables')}</Link>
         <Link style={styles.link} to="/history">{t('pagetitle_history')}</Link>
+        <Link style={styles.link} to="/fleet">{t('pagetitle_fleet')}</Link>
+        {/* <Link style={styles.link} to="/dashboard">{t('pagetitle_dashboard')}</Link> */}
         {/* <Link style={styles.link} to="/stats">{t('pagetitle_stats')}</Link> */}
       </div>
       <div style={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
@@ -61,6 +65,8 @@ export function App() {
           <Route path="/" element={<MapPage />} />
           <Route path="/timetables" element={<TimetablesPage />} />
           <Route path="/history" element={<HistoryPage />} />
+          <Route path="/fleet" element={<FleetPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           {/* <Route path="/stats" element={<StatsPage />} /> */}
         </Routes>
       </BrowserRouter>

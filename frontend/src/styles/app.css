@@ -8,7 +8,11 @@
   --bus-marker-border: #666666;
   --text-main: #000000;
   --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --text-inverted: #ffffff;
   --link-color: #0b5;
+  --banner-collapsed-bg:#f0f0f0; 
+  --banner-expanded-bg: #f9f9f9;
 }
 
 [data-theme="dark"] {
@@ -21,7 +25,11 @@
   --bus-marker-border: #e0e0e0;
   --text-main: #e0e0e0;
   --text-secondary: #b0b0b0;
+  --text-tertiary: #888888;
+  --text-inverted: #1a1a1a;
   --link-color: #5FDDC2;
+  --banner-collapsed-bg: #444444;
+  --banner-expanded-bg: #242424;
 }
 
 html, body, #root {

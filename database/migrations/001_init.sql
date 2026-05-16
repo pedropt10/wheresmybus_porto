@@ -61,6 +61,15 @@ CREATE TABLE IF NOT EXISTS bus.ingest_run (
   error_message        text
 );
 
+CREATE TABLE IF NOT EXISTS bus.fleet (
+    vehicle_id TEXT PRIMARY KEY,
+    vehicle_license_plate TEXT,
+    vehicle_type TEXT,
+    vehicle_fuel TEXT,
+    vehicle_model TEXT,
+    vehicle_chassis_year INTEGER
+);
+
 CREATE TABLE IF NOT EXISTS gtfs.routes (
     route_id TEXT PRIMARY KEY,
     route_short_name TEXT,

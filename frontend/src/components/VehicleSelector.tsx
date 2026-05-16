@@ -194,17 +194,23 @@ const styles: Record<string, React.CSSProperties> = {
     top: 0,
     zIndex: 1000
   },
+
   left: { display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" },
   right: { display: "flex", alignItems: "center" },
+  
   label: { display: "flex", alignItems: "center", fontSize: 14 },
+
   input: { padding: "6px 8px", border: "1px solid var(--border-color)", borderRadius: 6, width: 100, 
     background: "var(--bg-input-select)", color: "var(--text-main)" },
+
   select: { padding: "6px 8px", border: "1px solid var(--border-color)", borderRadius: 6, 
     background: "var(--bg-input-select)", color: "var(--text-main)" },
+
   button: {
     padding: "6px 10px", borderRadius: 6, border: "1px solid var(--border-color)",
     background: "var(--bg-button)", color: "var(--text-main)", cursor: "pointer"
   },
+
   muted: { color: "var(--text-main)", opacity: 0.7, fontSize: 12 },
 
   dropdown: {

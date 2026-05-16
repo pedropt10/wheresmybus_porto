@@ -9,6 +9,9 @@ import { useLanguage } from "../context/LanguageContext";
 type Tab = "trip" | "route";
 
 export function HistoryPage() {
+  
+  const { t } = useLanguage();
+
   const [activeTab, setActiveTab] = useState<Tab>("trip");
   const [allRoutes, setAllRoutes] = useState<AllRoutes[]>([]);
   
@@ -29,7 +32,6 @@ export function HistoryPage() {
   const [loading, setLoading] = useState(false);
   const [selectedRouteColors, setRouteColors] = useState({ bgColor: 'transparent', textColor: 'inherit' });
 
-  const { t } = useLanguage();
 
   useEffect(() => {
     fetchAllRoutes().then(setAllRoutes).catch(console.error);
@@ -136,47 +138,47 @@ export function HistoryPage() {
       <div style={{ padding: "15px", display: "flex", gap: "10px", flexWrap: "wrap", 
         alignItems: "flex-end", background: "var(--bg-sub-header)", borderBottom: "1px solid var(--border-color)" }}>
         <div className="field">
-          <label style={labelStyle}>{t("gen_route")}</label>
+          <label style={styles.label}>{t("gen_route")}</label>
           <select value={selectedRoute} onChange={(e) => {
             setSelectedRoute(e.target.value); 
             setSelectedTrip(""); // Reset the trip whenever the route changes
-          }} style={inputStyle}>
+          }} style={styles.dropdown}>
             <option value="">{t("history_route_select")}</option>
-            {allRoutes.map(r => <option key={r.route_id} value={r.route_id}>{r.route_short_name}</option>)}
+            {allRoutes.map(r => <option key={r.route_id} value={r.route_id} style={styles.dropdownItem}>{r.route_short_name}</option>)}
           </select>
         </div>
 
         {activeTab === "trip" ? (
           <div className="field">
-            <label style={labelStyle}>{t("history_trip_id")}</label>
-            <select value={selectedTrip} onChange={(e) => setSelectedTrip(e.target.value)} style={inputStyle} disabled={availableTrips.length === 0}>
+            <label style={styles.label}>{t("history_trip_id")}</label>
+            <select value={selectedTrip} onChange={(e) => setSelectedTrip(e.target.value)} style={styles.input} disabled={availableTrips.length === 0}>
                 <option value="" hidden={!!selectedTrip}>
                     {availableTrips.length > 0 ? t("history_trip_select") : t("history_trip_notripsfound")}
                 </option>
                 {availableTrips.map(tid => (
-                    <option key={tid} value={tid}>{tid}</option>
+                    <option key={tid} value={tid} style={styles.dropdownItem}>{tid}</option>
                 ))}
             </select>
           </div>
         ) : (
           <>
             <div className="field">
-              <label style={labelStyle}>{t("history_start_time")}</label>
-              <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} style={inputStyle} />
+              <label style={styles.label}>{t("history_start_time")}</label>
+              <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} style={styles.input} />
             </div>
             <div className="field">
-              <label style={labelStyle}>{t("history_end_time")}</label>
-              <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} style={inputStyle} />
+              <label style={styles.label}>{t("history_end_time")}</label>
+              <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} style={styles.input} />
             </div>
           </>
         )}
 
         <div className="field">
-          <label style={labelStyle}>{t("gen_date")}</label>
-          <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} style={inputStyle} />
+          <label style={styles.label}>{t("gen_date")}</label>
+          <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} style={styles.input} />
         </div>
 
-        <button onClick={handleSearch} disabled={loading} style={searchButtonStyle}>
+        <button onClick={handleSearch} disabled={loading} style={styles.button}>
           {loading ? t("gen_searching") : t("history_search_btn")}
         </button>
       </div>
@@ -278,6 +280,33 @@ const tabStyle = (active: boolean) => ({
   transition: "all 0.2s ease",
 });
 
-const labelStyle: React.CSSProperties = { display: "block", fontSize: "11px", fontWeight: "bold", marginBottom: "4px" };
-const inputStyle = { padding: "6px", borderRadius: "4px", border: "1px solid #ccc" };
-const searchButtonStyle = { padding: "8px 16px", background: "#0b5", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" };
+const styles: Record<string, React.CSSProperties> = {
+
+  button: {
+    padding: "8px 16px", background: "var(--bg-button)", color: "var(--text-main)",
+    border: "none", borderRadius: "4px", cursor: "pointer" },
+
+  input: { 
+    padding: "6px 8px", border: "1px solid var(--border-color)", borderRadius: 6, minWidth: 120,
+    background: "var(--bg-input-select)", color: "var(--text-main)" },
+
+  label: {
+    display: "block", fontSize: "11px", fontWeight: "bold", marginBottom: "4px" },
+    
+  select: { 
+    position: "relative",  display: "flex", alignItems: "center",
+    background: "var(--bg-input-select)", border: "1px solid var(--border-color)", borderRadius: 4,
+    padding: "2px 4px", minHeight: 30, minWidth: 120, cursor: "text", color: "var(--text-main)" },
+
+  dropdown: {
+    position: "relative", padding: "6px 8px", 
+    minHeight: 30, minWidth: 120, overflowY: "auto",
+    color: "var(--text-main)", backgroundColor: "var(--bg-input-select)", 
+    border: "1px solid var(--border-color)", borderRadius: 4 },
+
+  dropdownItem: {
+    padding: "8px 12px", cursor: "pointer",
+    fontSize: 13, borderBottom: "1px solid var(--border-color)",
+    color: "var(--text-main)", backgroundColor: "var(--bg-input-select)",
+    whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }
+};

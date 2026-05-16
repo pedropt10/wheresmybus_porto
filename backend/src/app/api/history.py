@@ -26,7 +26,7 @@ class VehicleHistory(BaseModel):
 
 @router.get("/history", response_model=List[VehicleHistory])
 async def get_vehicle_history(
-    mode: str = Query(..., regex="^(trip|route)$"),
+    mode: str = Query(..., pattern="^(trip|route)$"),
     route_id: str = Query(...),
     date: str = Query(...), # Format: YYYY-MM-DD
     trip_id: Optional[str] = Query(None),
@@ -139,42 +139,6 @@ async def get_trip_execution(
     try:
         with psycopg.connect(DATABASE_URL) as conn:
             with conn.cursor() as cur:
-                # cur.execute("""
-                #     WITH trip_identity AS (
-                #         -- Step 1: Identify the ONE vehicle that ran this trip
-                #         SELECT vehicle_id
-                #         FROM bus.vehicle_observation
-                #         WHERE trip_id = %s 
-                #           AND observed_at::date = %s::date
-                #           AND vehicle_id IS NOT NULL
-                #         LIMIT 1
-                #     ),
-                #     unique_observations AS (
-                #         -- Step 2: Get the first arrival at each stop for ONLY that vehicle
-                #         SELECT DISTINCT ON (cur_stop_id)
-                #             cur_stop_id,
-                #             observed_at
-                #         FROM bus.vehicle_observation
-                #         WHERE trip_id = %s 
-                #           AND observed_at::date = %s::date
-                #           AND vehicle_id = (SELECT vehicle_id FROM trip_identity)
-                #           AND cur_stop_id IS NOT NULL
-                #         ORDER BY cur_stop_id, observed_at ASC
-                #     )
-                #     SELECT 
-                #         st.trip_id,
-                #         (SELECT vehicle_id FROM trip_identity) as vehicle_id,
-                #         uo.cur_stop_id AS real_stop_id, 
-                #         uo.observed_at AS real_arrival_time, 
-                #         st.stop_id AS planned_stop_id, 
-                #         s.stop_name AS planned_stop_name, 
-                #         st.arrival_time AS planned_arrival_time
-                #     FROM gtfs.stop_times st
-                #     JOIN gtfs.stops s ON st.stop_id = s.stop_id
-                #     LEFT JOIN unique_observations uo ON st.stop_id = uo.cur_stop_id
-                #     WHERE st.trip_id = %s
-                #     ORDER BY st.stop_sequence ASC
-                # """, (trip_id, date, trip_id, date, trip_id))
                 cur.execute("""
                     WITH trip_identity AS (
                         -- Get vehicle and the shape geometry for this specific trip
@@ -273,3 +237,242 @@ async def get_trip_execution(
             
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+class RouteInfo(BaseModel):
+    route_id: str
+    route_long_name: Optional[str]
+
+
+class VehicleRouteHistory(BaseModel):
+    date: str
+    vehicle_id: str
+    routes: List[RouteInfo]
+
+
+@router.get("/history/vehicle", response_model=VehicleRouteHistory)
+async def get_routes_by_vehicle_for_date(
+    vehicle_id: str = Query(...),
+    date: str = Query(...)
+):
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT DISTINCT
+                        o.route_id,
+                        r.route_long_name
+                    FROM bus.vehicle_observation o
+                    LEFT JOIN gtfs.routes r ON o.route_id = r.route_id
+                    WHERE o.vehicle_id = %s
+                        AND o.observed_at >= %s AND o.observed_at < (%s::date + '1 day'::interval)
+                    """, (vehicle_id, date, date))
+                
+                rows = cur.fetchall()
+
+                routes = [
+                    {"route_id": row[0], "route_long_name": row[1]} 
+                    for row in rows
+                ]
+
+                return {
+                    "date": date,
+                    "vehicle_id": vehicle_id,
+                    "routes": routes
+                }
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+class RouteVehicleInfo(BaseModel):
+    route_id: str
+    route_long_name: Optional[str]
+    vehicles: List[str]  # List of all vehicles on this route for the day
+
+class GlobalRouteHistory(BaseModel):
+    date: str
+    routes: List[RouteVehicleInfo]
+
+@router.get("/history/vehicles-by-route-by-date", response_model=GlobalRouteHistory)
+async def get_routes_for_date(
+    date: str = Query(..., examples=["2026-05-15"])
+):
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                # We use string_agg or array_agg to get all unique vehicles per route
+                sql = """
+                    SELECT 
+                        o.route_id,
+                        r.route_long_name,
+                        ARRAY_AGG(DISTINCT o.vehicle_id) as vehicle_list
+                    FROM bus.vehicle_observation o
+                    LEFT JOIN gtfs.routes r ON o.route_id = r.route_id
+                    WHERE o.observed_at >= %s 
+                      AND o.observed_at < (%s::date + '1 day'::interval)
+                    GROUP BY o.route_id, r.route_long_name
+                    ORDER BY o.route_id ASC;
+                """
+                
+                cur.execute(sql, (date, date))
+                rows = cur.fetchall()
+
+                routes = [
+                    {
+                        "route_id": row[0],
+                        "route_long_name": row[1] or "Unknown Route",
+                        "vehicles": row[2] if row[2] is not None else []
+                    } 
+                    for row in rows
+                ]
+
+                return {
+                    "date": date,
+                    "routes": routes
+                }
+            
+    except Exception as e:
+        print(f"Database error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+class RouteSummary(BaseModel):
+    route_id: str
+    route_short_name: Optional[str] = "Unknown Route"
+    route_long_name: Optional[str] = "Unknown Route"
+    route_first_observed: Optional[datetime] = None
+    route_last_observed: Optional[datetime] = None
+
+class VehicleActivity(BaseModel):
+    vehicle_id: str
+    vehicle_license_plate: Optional[str] = None
+    vehicle_type: Optional[str] = None
+    vehicle_fuel: Optional[str] = None
+    vehicle_model: Optional[str] = None
+    vehicle_chassis_year: Optional[int] = None
+    routes: List[RouteSummary]
+
+class VehicleDailyHistory(BaseModel):
+    date: str
+    vehicles: List[VehicleActivity]
+
+@router.get("/history/vehicle-daily", response_model=VehicleDailyHistory)
+async def get_all_vehicles_daily_activity(
+    date: str = Query(..., examples=["2026-05-15"])
+):
+    # sql = """
+    #     SELECT 
+    #         o.vehicle_id,
+    #         f.vehicle_license_plate,
+    #         f.vehicle_type,
+    #         f.vehicle_fuel,
+    #         f.vehicle_model,
+    #         f.vehicle_chassis_year,
+    #         jsonb_agg(DISTINCT jsonb_build_object(
+    #             'route_id', o.route_id,
+    #             'route_short_name', COALESCE(r.route_short_name, 'Unknown Route'),
+    #             'route_long_name', COALESCE(r.route_long_name, 'Unknown Route')
+    #         )) as route_list
+    #     FROM bus.vehicle_observation o
+    #     LEFT JOIN gtfs.routes r ON o.route_id = r.route_id
+    #     LEFT JOIN bus.fleet f ON o.vehicle_id = f.vehicle_id
+    #     WHERE o.observed_at >= %s 
+    #       AND o.observed_at < (%s::date + '1 day'::interval)
+    #     GROUP BY 
+    #         o.vehicle_id, 
+    #         f.vehicle_license_plate, 
+    #         f.vehicle_type, 
+    #         f.vehicle_fuel, 
+    #         f.vehicle_model, 
+    #         f.vehicle_chassis_year
+    #     ORDER BY o.vehicle_id ASC;
+    # """
+    
+    sql = """
+        WITH route_bounds AS (
+            SELECT 
+                o.vehicle_id,
+                o.route_id,
+                MIN(o.observed_at) as first_seen,
+                MAX(o.observed_at) as last_seen
+            FROM bus.vehicle_observation o
+            WHERE o.observed_at >= %s 
+              AND o.observed_at < (%s::date + '1 day'::interval)
+            GROUP BY o.vehicle_id, o.route_id
+        )
+        SELECT 
+            rb.vehicle_id,
+            f.vehicle_license_plate,
+            f.vehicle_type,
+            f.vehicle_fuel,
+            f.vehicle_model,
+            f.vehicle_chassis_year,
+            jsonb_agg(jsonb_build_object(
+                'route_id', rb.route_id,
+                'route_short_name', COALESCE(r.route_short_name, 'Unknown Route'),
+                'route_long_name', COALESCE(r.route_long_name, 'Unknown Route'),
+                'route_first_observed', rb.first_seen,
+                'route_last_observed', rb.last_seen
+            ) ORDER BY rb.first_seen ASC) as route_list
+        FROM route_bounds rb
+        LEFT JOIN gtfs.routes r ON rb.route_id = r.route_id
+        LEFT JOIN bus.fleet f ON rb.vehicle_id = f.vehicle_id
+        GROUP BY 
+            rb.vehicle_id, 
+            f.vehicle_license_plate, 
+            f.vehicle_type, 
+            f.vehicle_fuel, 
+            f.vehicle_model, 
+            f.vehicle_chassis_year
+        ORDER BY rb.vehicle_id ASC;
+    """
+    
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, (date, date))
+                rows = cur.fetchall()
+
+                # Process rows into the Pydantic model structure
+                vehicle_data = [
+                    {
+                        "vehicle_id": row[0],
+                        "vehicle_license_plate": row[1],
+                        "vehicle_type": row[2],
+                        "vehicle_fuel": row[3],
+                        "vehicle_model": row[4],
+                        "vehicle_chassis_year": row[5],
+                        "routes": row[6] if row[6] is not None else [] # row[6] is already a list of dicts from jsonb_agg
+                    }
+                    for row in rows
+                ]
+
+                return {
+                    "date": date,
+                    "vehicles": vehicle_data
+                }
+            
+                # Resulting JSON structure:
+                # {
+                #   "date": "2026-05-15",
+                #   "vehicles": [
+                #     {
+                #       "vehicle_id": "2105",
+                #       "vehicle_license_plate": "AA-00-AA",
+                #       "vehicle_type": "articulated",
+                #       "vehicle_fuel": "CNG",
+                #       "vehicle_model": "MAN Lion's City G CNG",
+                #       "vehicle_chassis_year": 2015,
+                #       "routes": [
+                #         {"route_id": "701", "route_short_name": "701", "route_long_name": "Bolhão - Ermesinde", 
+                # "route_first_observed": "2026-05-16T09:00:20", "route_last_observed": "2026-05-16T15:00:20"},
+                #         {"route_id": "704", "route_short_name": "704", "route_long_name": "Boavista - Codiceira"
+                # "route_first_observed": "2026-05-16T09:00:20", "route_last_observed": "2026-05-16T15:00:20"},
+                #       ]
+                #     }
+                #   ]
+                # }
+                            
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch fleet activity.")

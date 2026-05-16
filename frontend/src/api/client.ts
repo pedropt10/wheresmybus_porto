@@ -1,5 +1,5 @@
 // ==================================
-//          OBSERVATIONS
+//      OBSERVATIONS / HISTORY
 // ==================================
 
 export type VehicleLatest = {
@@ -54,6 +54,46 @@ export async function fetchHistory(params: {
   const res = await fetch(`${API_BASE}/api/history?${query}`);
   if (!res.ok) throw new Error("Failed to fetch history");
   return res.json();
+}
+
+export interface RouteSummary {
+  route_id: string;
+  route_short_name: string;
+  route_long_name: string;
+  route_first_observed: string;
+  route_last_observed: string;
+}
+
+export interface VehicleActivity {
+  vehicle_id: string;
+  vehicle_license_plate: string;
+  vehicle_type: string;
+  vehicle_fuel: string;
+  vehicle_model: string;
+  vehicle_chassis_year: number;
+  routes: RouteSummary[]; // The nested routes from your jsonb_agg
+}
+
+export interface VehicleDailyHistoryResponse {
+  date: string;
+  vehicles: VehicleActivity[];
+}
+
+export async function fetchVehicleDailyHistory(date: string): Promise<VehicleDailyHistoryResponse | null> {
+  const url = new URL(`${API_BASE}/api/history/vehicle-daily`);
+  url.searchParams.set("date", date);
+
+  try {
+    const res = await fetch(url.toString(), { cache: "no-store" });
+    if (!res.ok) {
+      console.warn("Fetch vehicles daily history returned non-OK status:", res.status);
+      return null;
+    }
+    return await res.json();
+  } catch (err) {
+    console.error("Error fetching vehicle daily history:", err);
+    return null;
+  }
 }
 
 
@@ -194,7 +234,7 @@ export type StopPlannedArrival = {
 };
 
 export async function fetchPlannedArrivals(stopId: string): Promise<StopPlannedArrival[]> {
-  const url = `${API_BASE}/api/arrivals/${stopId}`;
+  const url = new URL(`${API_BASE}/api/arrivals/${stopId}`);
 
   try {
     const res = await fetch(url, { cache: "no-store" });
@@ -208,7 +248,7 @@ export async function fetchPlannedArrivals(stopId: string): Promise<StopPlannedA
 
 
 export async function fetchAvailableTrips(route_id: string, date: string): Promise<string[]> {
-  const url = `${API_BASE}/api/history/trips-list?route_id=${route_id}&date=${date}`;
+  const url = new URL(`${API_BASE}/api/history/trips-list?route_id=${route_id}&date=${date}`);
   console.log("Fetching trips from:", url); // Debug the actual URL
   const res = await fetch(url);
   
@@ -243,7 +283,7 @@ export async function fetchDailyTimetable(
   route_id: string, 
   direction_id: number
 ): Promise<TimetableResponse> {
-  const url = `${API_BASE}/api/schedules/daily?date=${date}&route_id=${route_id}&direction_id=${direction_id}`;
+  const url = new URL(`${API_BASE}/api/schedules/daily?date=${date}&route_id=${route_id}&direction_id=${direction_id}`);
   console.log("Fetching timetable from:", url);
   const res = await fetch(url);
   
@@ -275,7 +315,7 @@ export async function fetchTripExecution(
   trip_id: string, 
   date: string, 
 ): Promise<TripExecution[]> {
-  const url = `${API_BASE}/api/history/trip-execution?date=${date}&trip_id=${trip_id}`;
+  const url = new URL(`${API_BASE}/api/history/trip-execution?date=${date}&trip_id=${trip_id}`);
   console.log("Fetching trip real-time execution from:", url);
   const res = await fetch(url);
   
@@ -283,6 +323,33 @@ export async function fetchTripExecution(
     const errorData = await res.json().catch(() => ({}));
     console.error("Trip real-time execution fetch failed:", res.status, errorData.detail);
     throw new Error(errorData.detail || "Failed to fetch trip real-time execution");
+  }
+  return res.json();
+}
+
+export type RouteInfo = {
+    route_id: string;
+    route_long_name: string;
+};
+
+export type VehicleRouteHistory = {
+    vehicle_id: string;
+    date: string;
+    routes: RouteInfo[];
+};
+
+export async function fetchVehicleRouteHistory(
+  vehicle_id: string, 
+  date: string, 
+): Promise<VehicleRouteHistory> {
+  const url = new URL(`${API_BASE}/api/history/vehicle?vehicle_id=${vehicle_id}&date=${date}`);
+  console.log("Fetching vehicle route history from:", url);
+  const res = await fetch(url);
+  
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    console.error("Vehicle route history fetch failed:", res.status, errorData.detail);
+    throw new Error(errorData.detail || "Failed to fetch vehicle route history");
   }
   return res.json();
 }
@@ -338,3 +405,81 @@ export async function fetchTripOrigin(
 //     return null;
 //   }
 // }
+
+
+// ==================================
+//            VEHICLES
+// ==================================
+
+export interface AllVehicles {
+  vehicle_id: string;
+  vehicle_license_plate: string;
+  vehicle_type: string;
+  vehicle_fuel: string;
+  vehicle_model: string;
+  vehicle_chassis_year: number;
+}
+
+export async function fetchAllVehicles(): Promise<AllVehicles[]> {
+  const url = new URL(`${API_BASE}/api/vehicle`);
+
+  try {
+    const res = await fetch(url.toString(), { cache: "no-store" });
+    if (!res.ok) {
+      console.warn("Fetch vehicles returned non-OK status:", res.status);
+      return [];
+    }
+    return await res.json();
+  } catch (err) {
+    console.error("Error fetching all vehicles:", err);
+    return [];
+  }
+}
+
+
+// ==================================
+//           SHAPE SPINES
+// ==================================
+
+// class StopPoint(BaseModel):
+//     stop_id: str
+//     stop_name: str
+//     coordinates: List[float]  # [longitude, latitude]
+
+// class ShapeSpineResponse(BaseModel):
+//     shape_id: str
+//     direction_id: Optional[int] = None
+//     # We use Dict[str, Any] because PostGIS delivers native GeoJSON geometry dictionaries
+//     geometry: Dict[str, Any]  
+//     stops: List[StopPoint]
+
+export interface StopPoint {
+  stop_id: string;
+  stop_name: string;
+  coordinates: [number, number];
+}
+
+export interface ShapeSpine {
+  shape_id: string;
+  direction_id: number;
+  geometry: {
+    type: "LineString";
+    coordinates: [number, number][];
+  };
+  stops: StopPoint[];
+}
+
+export async function fetchShapeSpine(shapeId: string): Promise<ShapeSpine> {
+
+  const url = new URL(`${API_BASE}/api/stops/shape-spines`);
+  url.searchParams.set("shape_id", shapeId.trim());
+
+  try {
+    const res = await fetch(url.toString(), { cache: "no-store" });
+    if (!res.ok) throw new Error(`Failed to fetch shape spines: ${res.status}`);
+    return res.json();
+  } catch (err) {
+    console.error("Error fetching shape spines:", err);
+    throw new Error("Failed to fetch shape spines for shape_id" + shapeId);
+  }
+}

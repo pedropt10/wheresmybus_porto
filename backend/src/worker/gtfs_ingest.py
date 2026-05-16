@@ -765,6 +765,11 @@ def delete_gtfs_tables():
 
 def main():
  
+    # Run fleet_ingest.py to update fleet data 
+    # - not related with GTFS, but it runs in the same container (one-time run at startup)
+    from .fleet_ingest import main as fleet_ingest_main
+    fleet_ingest_main()
+
     # Run gtfs_update.py first to check for new files and download if needed
     from .gtfs_update import main as gtfs_update_main
     if gtfs_update_main():

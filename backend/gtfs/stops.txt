@@ -18,12 +18,15 @@ stop_lat,stop_lon,stop_id,stop_code,stop_name,zone_id,stop_url
 41.155925,-8.627762,1BS2,1BS2,Boavista - B.sucesso,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1BS2
 41.154520,-8.628210,1BS3,1BS3,Boavista - B.sucesso,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1BS3
 41.131652,-8.627853,1CAP1,1CAP1,Castro Portugal,VNG1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1CAP1
+41.215031,-8.590868,1CMLH1,1CMLH1,Correios Milheirós,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1CMLH1
+41.215330,-8.590617,1CMLH2,1CMLH2,Correios Milheirós,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1CMLH2
+41.215132,-8.590135,1CMLH3,1CMLH3,Correios Milheirós,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1CMLH3
 41.135350,-8.625340,1DAG2,1DAG2,Dr.antónio Granjo,VNG1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1DAG2
-41.149593,-8.617603,1DBR1,1DBR1,Diogo Brandão,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1DBR1
 41.125844,-8.621550,1DCM1,1DCM1,Dr. Costa Matos,VNG1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1DCM1
 41.129731,-8.618864,1DEV1,1DEV1,Devesas,VNG1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1DEV1
 41.113362,-8.612542,1FL2,1FL2,Fernão Lopes,VNG1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1FL2
 41.134444,-8.539010,1GFE1,1GFE1,Gondomar (feira),GDM1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1GFE1
+41.148054,-8.620533,1HSA3,1HSA3,Hospital Santo António,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1HSA3
 41.193567,-8.696674,1ILEC1,1ILEC1,Igreja De Leça,MTS2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1ILEC1
 41.193808,-8.696874,1ILEC2,1ILEC2,Igreja De Leça,MTS2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1ILEC2
 41.124321,-8.618902,1JFT1,1JFT1,José Fontana,VNG1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1JFT1
@@ -31,7 +34,6 @@ stop_lat,stop_lon,stop_id,stop_code,stop_name,zone_id,stop_url
 41.154309,-8.647614,1LRD1,1LRD1,Lordelo,PRT2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1LRD1
 41.212505,-8.675936,1MAVO1,1MAVO1,Monte Avó,MTS2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1MAVO1
 41.212618,-8.676052,1MAVO2,1MAVO2,Monte Avó,MTS2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1MAVO2
-41.149826,-8.619795,1MGB1,1MGB1,Miguel Bombarda,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1MGB1
 41.130435,-8.630094,1MST1,1MST1,Machado Dos Santos,VNG1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1MST1
 41.126652,-8.617411,1MZA1,1MZA1,Mouzinho Albuquerque,VNG1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1MZA1
 41.238310,-8.608980,1NAL1,1NAL1,R. Nova Dos Altos,MAI1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1NAL1
@@ -40,6 +42,8 @@ stop_lat,stop_lon,stop_id,stop_code,stop_name,zone_id,stop_url
 41.203822,-8.565325,1PPI1,1PPI1,Parque Pícua,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1PPI1
 41.203737,-8.565363,1PPI2,1PPI2,Parque Pícua,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1PPI2
 41.114360,-8.612550,1RAS2,1RAS2,R. Da Rasa,VNG1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1RAS2
+41.213718,-8.592829,1RGH1,1RGH1,R.general Humberto Delgado,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1RGH1
+41.213702,-8.593404,1RGH2,1RGH2,R. General Humberto Delgado,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1RGH2
 41.136045,-8.533121,1RI1,1RI1,Rua Da Igreja,GDM1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1RI1
 41.144713,-8.610836,1SBNT,1SBNT,S.bento,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1SBNT
 41.144628,-8.610812,1SBNT1,1SBNT1,Est.s.bento,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=1SBNT1
@@ -158,8 +162,6 @@ stop_lat,stop_lon,stop_id,stop_code,stop_name,zone_id,stop_url
 41.224657,-8.710711,ALDN1,ALDN1,Aldeia Nova,MTS2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=ALDN1
 41.224583,-8.710889,ALDN2,ALDN2,Aldeia Nova,MTS2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=ALDN2
 41.240758,-8.525564,ALF,ALF,Alfena,VLG2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=ALF
-41.184028,-8.683806,ALFC1,ALFC1,Alfredo Cunha,MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=ALFC1
-41.184361,-8.684306,ALFC2,ALFC2,Alfredo Cunha,MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=ALFC2
 41.143790,-8.622006,ALFG1,ALFG1,Alfândega,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=ALFG1
 41.143980,-8.622730,ALFG2,ALFG2,Alfândega,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=ALFG2
 41.240740,-8.525412,ALFN1,ALFN1,Alfena,VLG2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=ALFN1
@@ -182,7 +184,6 @@ stop_lat,stop_lon,stop_id,stop_code,stop_name,zone_id,stop_url
 41.236951,-8.612737,ALT2,ALT2, Altos,MAI1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=ALT2
 41.132582,-8.652442,ALUM1,ALUM1,Alumiara,VNG5,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=ALUM1
 41.131406,-8.653529,ALUM2,ALUM2,Alumiara,VNG5,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=ALUM2
-41.183360,-8.687979,ALVC,ALVC,Álvaro Castelões,MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=ALVC
 41.224139,-8.695167,ALVS1,ALVS1,Joaquim Alves Silva,MTS2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=ALVS1
 41.223917,-8.695056,ALVS2,ALVS2,Joaquim Alves Silva,MTS2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=ALVS2
 41.175090,-8.609420,ALVT2,ALVT2,Almeida Valente,PRT3,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=ALVT2
@@ -420,7 +421,6 @@ stop_lat,stop_lon,stop_id,stop_code,stop_name,zone_id,stop_url
 41.171884,-8.587983,BRRS2,BRRS2,Barrocas,PRT3,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=BRRS2
 41.181239,-8.636582,BRSE1,BRSE1,Br. Sto. Eugénio,PRT2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=BRSE1
 41.181501,-8.636394,BRSE2,BRSE2,Br. Sto. Eugénio,PRT2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=BRSE2
-41.182306,-8.690417,BRTC1,BRTC1,Brito Capelo,MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=BRTC1
 41.181681,-8.690307,BRTC2,BRTC2,Brito Capelo,MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=BRTC2
 41.181797,-8.690372,BRTC4,BRTC4,Brito Capelo,MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=BRTC4
 41.178556,-8.688833,BRTC5,BRTC5,Brito Capelo,MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=BRTC5
@@ -699,8 +699,6 @@ stop_lat,stop_lon,stop_id,stop_code,stop_name,zone_id,stop_url
 41.213408,-8.554151,CRZ1,CRZ1,Cruzeiro,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=CRZ1
 41.213274,-8.554362,CRZ2,CRZ2,Cruzeiro,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=CRZ2
 41.175976,-8.666497,CSA3,CSA3,C.saúde De Aldoar,PRT2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=CSA3
-41.218278,-8.589083,CSAD1,CSAD1,Centro Saúde,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=CSAD1
-41.219111,-8.588667,CSAD4,CSAD4,Centro Saúde,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=CSAD4
 41.164532,-8.632138,CSBV,CSBV,Casa De Saúde Da Boavista,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=CSBV
 41.165012,-8.631034,CSBV1,CSBV1,Casa De Saúde Da Boavista,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=CSBV1
 41.156872,-8.590368,CSC,CSC,C. Saúde Campanhã,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=CSC
@@ -1432,7 +1430,6 @@ stop_lat,stop_lon,stop_id,stop_code,stop_name,zone_id,stop_url
 41.207563,-8.685019,MARS2,MARS2,Mar Shopping Nascente,MTS2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=MARS2
 41.182722,-8.682250,MATC1,MATC1,Matosinhos (cmm),MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=MATC1
 41.181726,-8.682901,MATC2,MATC2,Matosinhos (cmm),MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=MATC2
-41.186353,-8.685350,MATI2,MATI2,Matosinhos (igreja),MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=MATI2
 41.187670,-8.693370,MATM1,MATM1,Matosinhos Mercado,MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=MATM1
 41.187710,-8.693240,MATM2,MATM2,Matosinhos (mercado),MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=MATM2
 41.187283,-8.692044,MATM3,MATM3,Matosinhos Mercado,MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=MATM3
@@ -1528,7 +1525,7 @@ stop_lat,stop_lon,stop_id,stop_code,stop_name,zone_id,stop_url
 41.176989,-8.651836,MPAZ5,MPAZ5,Man.p.azevedo 3,PRT2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=MPAZ5
 41.175971,-8.650836,MPAZ6,MPAZ6,Man.p.azevedo 3,PRT2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=MPAZ6
 41.176033,-8.652084,MPAZ7,MPAZ7,Man.p.azevedo 3,PRT2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=MPAZ7
-41.160961,-8.604060,MPL1,MPL1,Marquês,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=MPL1
+41.160930,-8.604110,MPL1,MPL1,Marquês,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=MPL1
 41.160712,-8.606003,MPL11,MPL11,Marquês,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=MPL11
 41.160802,-8.604137,MPL2,MPL2,Marquês,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=MPL2
 41.161358,-8.604809,MPL4,MPL4,Marquês,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=MPL4
@@ -1805,7 +1802,6 @@ stop_lat,stop_lon,stop_id,stop_code,stop_name,zone_id,stop_url
 41.175255,-8.627587,PPR1,PPR1,Parque Da Prelada,PRT2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=PPR1
 41.175073,-8.627708,PPR2,PPR2,Parque Da Prelada,PRT2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=PPR2
 41.182700,-8.685599,PQBT2,PQBT2,Pq Basílio Teles,MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=PQBT2
-41.182420,-8.684532,PQBT3,PQBT3,Parque Basílio Teles,MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=PQBT3
 41.182039,-8.685115,PQBT4,PQBT4,Pq Basílio Teles,MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=PQBT4
 41.171805,-8.677634,PQC1,PQC1,Parque Da Cidade,PRT2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=PQC1
 41.171442,-8.678191,PQC2,PQC2,Parque Da Cidade,PRT2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=PQC2
@@ -1974,8 +1970,6 @@ stop_lat,stop_lon,stop_id,stop_code,stop_name,zone_id,stop_url
 41.233441,-8.604438,RAL5,RAL5,Real,MAI1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=RAL5
 41.233297,-8.604296,RAL6,RAL6,Real,MAI1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=RAL6
 41.159750,-8.602444,RALG,RALG,R. Da Alegria,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=RALG
-41.219227,-8.591409,RARR1,RARR1,Arroteia,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=RARR1
-41.218972,-8.591667,RARR2,RARR2,Arroteia,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=RARR2
 41.151888,-8.572218,RAZ,RAZ,R. Azevedo,PRT3,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=RAZ
 41.179892,-8.572060,RBD1,RBD1,Rebordãos,PRT3,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=RBD1
 41.180180,-8.572253,RBD2,RBD2,Rebordãos,PRT3,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=RBD2
@@ -1999,8 +1993,6 @@ stop_lat,stop_lon,stop_id,stop_code,stop_name,zone_id,stop_url
 41.110920,-8.657771,RCH2,RCH2,R. Chaquedas,VNG4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=RCH2
 41.191667,-8.513667,RCMB1,RCMB1,Ribeiro Cambado,VLG1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=RCMB1
 41.192189,-8.514142,RCMB2,RCMB2,Ribeiro Cambado,VLG1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=RCMB2
-41.221143,-8.590321,RCNH1,RCNH1,R.conchas,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=RCNH1
-41.221173,-8.590750,RCNH2,RCNH2,R. Conchas,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=RCNH2
 41.170330,-8.586720,RCON,RCON,R. Contumil,PRT3,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=RCON
 41.164444,-8.567278,RCP1,RCP1,R. Cerco Do Porto,PRT3,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=RCP1
 41.164833,-8.567389,RCP2,RCP2,R. Cerco Do Porto,PRT3,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=RCP2
@@ -2218,7 +2210,6 @@ stop_lat,stop_lon,stop_id,stop_code,stop_name,zone_id,stop_url
 41.148389,-8.631694,SMAI2,SMAI2,Salgueiro Maia,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=SMAI2
 41.188327,-8.685172,SMAT1,SMAT1,Senhor Matosinhos,MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=SMAT1
 41.188472,-8.685164,SMAT2,SMAT2,Senhor Matosinhos,MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=SMAT2
-41.187778,-8.686167,SMAT4,SMAT4,Sr. Matosinhos,MTS1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=SMAT4
 41.193882,-8.611193,SMM1,SMM1,S. Mamede,MAI1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=SMM1
 41.192333,-8.611510,SMM2,SMM2,S. Mamede,MAI1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=SMM2
 41.193159,-8.609220,SMM3,SMM3,S. Mamede,MAI1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=SMM3
@@ -2301,7 +2292,6 @@ stop_lat,stop_lon,stop_id,stop_code,stop_name,zone_id,stop_url
 41.168833,-8.554833,STBX2,STBX2,Soutelo Baixo,GDM1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=STBX2
 41.150705,-8.650994,STC1,STC1,S.ta Catarina,PRT2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=STC1
 41.150485,-8.651097,STC2,STC2,S.ta Catarina,PRT2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=STC2
-41.217073,-8.674615,STCB2,STCB2,Sta.cruz Bispo,MTS2,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=STCB2
 41.167279,-8.578577,STCT,STCT,Souto Contumil,PRT3,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=STCT
 41.160814,-8.531208,STCZ1,STCZ1,S.ta Cruz,GDM1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=STCZ1
 41.161160,-8.531566,STCZ2,STCZ2,S.ta Cruz,GDM1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=STCZ2
@@ -2481,8 +2471,6 @@ stop_lat,stop_lon,stop_id,stop_code,stop_name,zone_id,stop_url
 41.157311,-8.643154,VENZ2,VENZ2,Venezuela,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=VENZ2
 41.184145,-8.459654,VERT1,VERT1,Vertido,VLG3,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=VERT1
 41.184145,-8.460070,VERT2,VERT2,Vertido,VLG3,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=VERT2
-41.215847,-8.593106,VESS1,VESS1,Vessada,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=VESS1
-41.215778,-8.593336,VESS2,VESS2,Vessada,MAI4,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=VESS2
 41.165712,-8.610822,VFM1,VFM1,Vale Formoso,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=VFM1
 41.166552,-8.612628,VFM2,VFM2,Vale Formoso,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=VFM2
 41.166460,-8.612570,VFM3,VFM3,Vale Formoso,PRT1,http://www.stcp.pt/pt/viajar/paragens/?t=detalhe&paragem=VFM3

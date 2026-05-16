@@ -1,8 +1,11 @@
-import psycopg
+import os
 from fastapi import APIRouter, HTTPException, Query
-from app.config import settings
+from pydantic import BaseModel
+import psycopg
+from typing import List, Dict, Any, Optional
 
 router = APIRouter()
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 @router.get("/stops/route")
 async def get_stops_by_route(
@@ -30,7 +33,7 @@ async def get_stops_by_route(
     """
     
     try:
-        with psycopg.connect(settings.database_url) as conn:
+        with psycopg.connect(DATABASE_URL) as conn:
             with conn.cursor() as cur:
                 cur.execute(query, (route_id, direction_id, variant_id))
                 rows = cur.fetchall()
@@ -64,7 +67,7 @@ async def get_stops_by_trip(
     iterations = 20 if acceptTripFromOtherServiceCalendar and len(trip_id_parts) > 2 else 1
 
     try:
-        with psycopg.connect(settings.database_url) as conn:
+        with psycopg.connect(DATABASE_URL) as conn:
             for offset in range(iterations):
                 
                 if offset == 0:
@@ -116,3 +119,110 @@ async def get_stops_by_trip(
     except Exception as e:
         if isinstance(e, HTTPException): raise e
         raise HTTPException(status_code=500, detail=str(e))
+
+
+class StopPoint(BaseModel):
+    stop_id: str
+    stop_name: str
+    coordinates: List[float]  # [longitude, latitude]
+
+class ShapeSpineResponse(BaseModel):
+    shape_id: str
+    direction_id: Optional[int] = None
+    # We use Dict[str, Any] because PostGIS delivers native GeoJSON geometry dictionaries
+    geometry: Dict[str, Any]  
+    stops: List[StopPoint]
+
+@router.get("/stops/shape-spines", response_model=ShapeSpineResponse)
+async def get_stop_spines_by_shape(
+    shape_id: str = Query(..., examples=["300_0_3|0"]),
+):
+    """
+    Fetches the precise spatial LineString path layout and ordered physical 
+    passenger stops for a unique GTFS shape identifier.
+    """
+    query = """
+        WITH line_geom AS (
+            -- 1. Grab the pre-compiled street route LineString directly
+            SELECT 
+                ST_AsGeoJSON(geom)::jsonb as line_geom
+            FROM gtfs.shapes
+            WHERE shape_id = %s
+            LIMIT 1
+        ),
+        stop_list AS (
+            -- 2. Aggregate the passenger node points snapped along this shape itinerary
+            SELECT 
+                jsonb_agg(jsonb_build_object(
+                    'stop_id', s.stop_id,
+                    'stop_name', s.stop_name,
+                    'coordinates', jsonb_build_array(s.stop_lon, s.stop_lat)
+                ) ORDER BY ss.stop_sequence ASC) as stops
+            FROM gtfs.shape_stops ss
+            JOIN gtfs.stops s ON ss.stop_id = s.stop_id
+            WHERE ss.shape_id = %s
+        ),
+        direction_lookup AS (
+            -- 3. Grab the direction attribute if it exists via metadata logs
+            SELECT direction_id 
+            FROM gtfs.trips 
+            WHERE shape_id = %s 
+            LIMIT 1
+        )
+        SELECT 
+            COALESCE((SELECT direction_id FROM direction_lookup), 0) as direction_id,
+            (SELECT line_geom FROM line_geom) as geometry,
+            COALESCE((SELECT stops FROM stop_list), '[]'::jsonb) as stops;
+    """
+    
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(query, (shape_id, shape_id, shape_id))
+                row = cur.fetchone()
+                
+                if not row or row[1] is None:
+                    raise HTTPException(
+                        status_code=404, 
+                        detail=f"Shape ID '{shape_id}' geometry records not found."
+                    )
+                
+                return {
+                    "shape_id": shape_id,
+                    "direction_id": row[0],
+                    "geometry": row[1],
+                    "stops": row[2]
+                }
+            
+                # Resulting ShapeSpineResponse JSON structure example:
+                # {
+                # "shape_id": "300_0_3|0",
+                # "direction_id": 0,
+                # "geometry": {
+                #     "type": "LineString",
+                #     "coordinates": [
+                #     [-8.6112, 41.1499],
+                #     [-8.6101, 41.1512],
+                #     [-8.6085, 41.1530]
+                #     ]
+                # },
+                # "stops": [
+                #     {
+                #     "stop_id": "PRL2",
+                #     "stop_name": "Praça da Liberdade",
+                #     "coordinates": [-8.6112, 41.1499]
+                #     },
+                #     {
+                #     "stop_id": "TRD1",
+                #     "stop_name": "Trindade",
+                #     "coordinates": [-8.6101, 41.1512]
+                #     }
+                # ]
+                # }
+
+    except HTTPException:
+        raise
+    
+    except Exception as e:
+        print(f"Database error executing shape collection query: {e}")
+        raise HTTPException(status_code=500, detail="Failed to compile shape spine data.")

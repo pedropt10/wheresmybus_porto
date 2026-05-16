@@ -22,11 +22,11 @@ services:
       timeout: 5s
       retries: 20
 
-  gtfs_setup:
-    profiles: ["setup"]
+  gtfs_and_fleet_setup:
+    # profiles: ["setup"]
     build:
       context: ./backend
-    container_name: bus_gtfs_ingest
+    container_name: bus_gtfs_and_fleet_ingest
     env_file: .env
     environment:
       DATABASE_URL: ${DATABASE_URL}
@@ -47,7 +47,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      gtfs_setup:
+      gtfs_and_fleet_setup:
         condition: service_completed_successfully
     volumes:
       - ./backend:/app
@@ -71,7 +71,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      gtfs_setup:
+      gtfs_and_fleet_setup:
         condition: service_completed_successfully
     command: ["python", "-m", "worker.ingest"]
 

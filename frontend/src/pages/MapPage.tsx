@@ -5,8 +5,8 @@ import { Map, getRouteColors } from "../components/Map";
 import { VehicleSelector } from "../components/VehicleSelector";
 
 export function MapPage() {
-  const [route, setRoute] = useState<string>("704");
-  const [direction, setDirection] = useState<number | null>(0);
+  const [selectedRoute, setSelectedRoute] = useState<string>("704");
+  const [selectedDirection, setSelectedDirection] = useState<number | null>(0);
   const [vehicles, setVehicles] = useState<VehicleLatest[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string | undefined>(undefined);
@@ -16,19 +16,17 @@ export function MapPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isListOpen, setIsListOpen] = useState(false);
   const [stops, setStops] = useState<Stop[]>([]);
-  const [selectedRoute, setSelectedRoute] = useState<string>("");
-  const [selectedDirection, setSelectedDirection] = useState<number | null>(null);
 
   const refresh = useCallback(async () => {
     try {
       setError(null);
-      const data = await fetchLatest(route, direction);
+      const data = await fetchLatest(selectedRoute, selectedDirection);
       setVehicles(data);
       setLastUpdated(new Date().toLocaleTimeString());
     } catch (e: any) {
       setError(e?.message ?? "Failed to load");
     }
-  }, [route, direction]);
+  }, [selectedRoute, selectedDirection]);
 
   useEffect(() => {
     refresh();
@@ -38,28 +36,28 @@ export function MapPage() {
 
   useEffect(() => {
     async function loadShape() {
-      // If route is empty/null (All Routes), clear shapes and stop
-      if (!route || route === "") {
+      // If selectedRoute is empty/null (All Routes), clear shapes and stop
+      if (!selectedRoute || selectedRoute === "") {
         setShapeData0(null);
         setShapeData1(null);
         return;
       }
 
-      if (direction === null) {
+      if (selectedDirection === null) {
         const [data0, data1] = await Promise.all([
-          fetchRouteShape(route, 0),
-          fetchRouteShape(route, 1)
+          fetchRouteShape(selectedRoute, 0),
+          fetchRouteShape(selectedRoute, 1)
         ]);
         setShapeData0(data0);
         setShapeData1(data1);
       } else {
-        const data = await fetchRouteShape(route, direction);
+        const data = await fetchRouteShape(selectedRoute, selectedDirection);
         setShapeData0(data);
         setShapeData1(null);
       }
     }
     loadShape();
-  }, [route, direction]);
+  }, [selectedRoute, selectedDirection]);
   
   // Fetch the routes once when the page mounts
   useEffect(() => {
@@ -76,12 +74,12 @@ export function MapPage() {
 
   useEffect(() => {
     async function loadStops() {
-      // Check if 'route' has a value. 
-      // We'll be more flexible with 'direction' in case it's 0.
-      if (route) {
-        console.log(`🔍 Fetching stops for Route: ${route}, Direction: ${direction}`);
+      // Check if 'selectedRoute' has a value. 
+      // We'll be more flexible with 'selectedDirection' in case it's 0.
+      if (selectedRoute) {
+        console.log(`🔍 Fetching stops for Route: ${selectedRoute}, Direction: ${selectedDirection}`);
         try {
-          const data = await fetchStops(route, direction);
+          const data = await fetchStops(selectedRoute, selectedDirection);
           setStops(data);
         } catch (err) {
           console.error("Failed to load stops:", err);
@@ -91,25 +89,25 @@ export function MapPage() {
       }
     }
     loadStops();
-  }, [route, direction]);
+  }, [selectedRoute, selectedDirection]);
 
   // const header = useMemo(() => {
   //   const n = vehicles.length;
     
   //   let directionLabel;
-  //     if (direction === 0) {
+  //     if (selectedDirection === 0) {
   //       directionLabel = '0 (Inbound)';
-  //     } else if (direction === 1) {
+  //     } else if (selectedDirection === 1) {
   //       directionLabel = '1 (Outbound)';
   //     } else {
   //       directionLabel = "(all)";
   //     }
 
-  //   const d = direction === null ? "all" : String(direction);
-  //   const routeDisplay = route === "" || !route ? "(all)" : route;
+  //   const d = selectedDirection === null ? "all" : String(selectedDirection);
+  //   const routeDisplay = selectedRoute === "" || !selectedRoute ? "(all)" : selectedRoute;
     
-  //   return `${n} vehicle${n === 1 ? "" : "s"} | route ${route || "(all)"} | direction ${directionLabel}`;
-  // }, [vehicles.length, route, direction]);
+  //   return `${n} vehicle${n === 1 ? "" : "s"} | selectedRoute ${selectedRoute || "(all)"} | selectedDirection ${directionLabel}`;
+  // }, [vehicles.length, selectedRoute, selectedDirection]);
 
   const mostRecentLocationTime = useMemo(() => {
     if (!vehicles || vehicles.length === 0) return undefined; 
@@ -137,10 +135,10 @@ export function MapPage() {
     return (
     <div style={{ height: "100vh", width: "100vw", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <VehicleSelector
-        route={route}
-        onRouteChange={setRoute}
-        direction={direction}
-        onDirectionChange={setDirection}
+        route={selectedRoute}
+        onRouteChange={setSelectedRoute}
+        direction={selectedDirection}
+        onDirectionChange={setSelectedDirection}
         onRefreshNow={refresh}
         lastUpdated={lastUpdated}
         mostRecentLocation={mostRecentLocationTime}
@@ -153,7 +151,7 @@ export function MapPage() {
       </div> */}
       <div style={{ flex: 1, position: "relative" }}>
         <Map vehicles={vehicles} shapeData0={shapeData0} shapeData1={shapeData1} stops={stops} 
-        selectedRoute={route} selectedDirection={direction} />
+        selectedRoute={selectedRoute} selectedDirection={selectedDirection} />
       </div>
     </div>
   );
