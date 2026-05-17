@@ -13,6 +13,7 @@ SELECT
   ST_X(l.geom) AS lon,
   ST_Y(l.geom) AS lat,
   s.stop_name AS last_stop_name,
+  r.route_short_name,
   r.route_long_name,
   t.trip_headsign,
   p.prev_observed_at,

@@ -471,7 +471,7 @@ export function Map({ vehicles, shapeData0, shapeData1, selectedRoute, selectedD
                 z-index: 2;
                 font-family: inherit;
               ">
-                ${v.route_id ?? '??'}
+                ${v.route_short_name ?? '??'}
               </div>
 
               ${showHeadsign ? `
@@ -516,7 +516,7 @@ export function Map({ vehicles, shapeData0, shapeData1, selectedRoute, selectedD
                       backgroundColor: routeMainBgColor, color: routeMainTextColor, 
                       padding: "2px 6px", borderRadius: 4, minWidth: 20,
                       display: "inline-block", textAlign: "center"
-                    }}><b>{v.route_id ?? "-"}</b></span> <b>{v.trip_headsign ?? getDirectionDestination(v.route_long_name, v.direction)}</b></div>
+                    }}><b>{v.route_short_name ?? "-"}</b></span> <b>{v.trip_headsign ?? getDirectionDestination(v.route_long_name, v.direction)}</b></div>
                     {/* <div><span style={{ 
                       backgroundColor: routeMainBgColor, color: routeMainTextColor, 
                       padding: "2px 6px", borderRadius: 4, minWidth: 20,
@@ -546,7 +546,7 @@ export function Map({ vehicles, shapeData0, shapeData1, selectedRoute, selectedD
                     backgroundColor: routeMainBgColor, color: routeMainTextColor, 
                     padding: "2px 6px", borderRadius: 4, minWidth: 20,
                     display: "inline-block", textAlign: "center"
-                  }}><b>{v.route_id ?? "-"}</b></span> <b>{v.trip_headsign ?? getDirectionDestination(v.route_long_name, v.direction)}</b></div>
+                  }}><b>{v.route_short_name ?? "-"}</b></span> <b>{v.trip_headsign ?? getDirectionDestination(v.route_long_name, v.direction)}</b></div>
                   <br></br>
                   <div>🚌 {v_label}</div>
                   <div></div>

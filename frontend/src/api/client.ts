@@ -14,6 +14,8 @@ export type VehicleLatest = {
   last_stop_id: string | null;
   last_stop_name: string | null;
   cur_stop_id: string | null;
+  
+  route_short_name?: string | null;
   route_long_name: string | null;
   trip_headsign: string | null;
 
@@ -22,7 +24,6 @@ export type VehicleLatest = {
   prev_lat: number | null;
   prev_heading: number | null;
 
-  route_short_name?: string | null;
 };
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";

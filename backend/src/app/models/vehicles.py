@@ -14,6 +14,7 @@ class VehicleLatest(BaseModel):
     cur_stop_id: str | None
     last_stop_id: str | None
     last_stop_name: str | None
+    route_short_name: str | None
     route_long_name: str | None
     trip_headsign: str | None
 

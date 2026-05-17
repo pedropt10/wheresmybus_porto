@@ -54,15 +54,20 @@ export function DashboardPage() {
             const data1 = await fetchShapeSpine("205_0_2|0");
             setShapeSpine1(data1);
 
-            // // 3. Fetch Route Colors
-            if (selectedRoute) {
-            // const selectedRouteColors = getRouteColors(selectedRoute, 0);
             const selectedRouteColors = getRouteColors("205", 0);
             setRouteColors({
                 bgColor: selectedRouteColors.bgColor || 'transparent',
                 textColor: selectedRouteColors.textColor || 'var--(text-main)'
             });
-            }
+
+            // // // Fetch Route Colors - temporarily disabled while 205 is the test bed
+            // if (selectedRoute) {
+            // const selectedRouteColors = getRouteColors(selectedRoute, 0);
+            // setRouteColors({
+            //     bgColor: selectedRouteColors.bgColor || 'transparent',
+            //     textColor: selectedRouteColors.textColor || 'var--(text-main)'
+            // });
+            // }
 
         } catch (e) {
             console.error("Search error:", e);

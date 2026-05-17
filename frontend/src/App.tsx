@@ -20,7 +20,7 @@ function Navigation({ isDark, setIsDark }: { isDark: boolean; setIsDark: (v: boo
         <Link style={styles.link} to="/timetables">{t('pagetitle_timetables')}</Link>
         <Link style={styles.link} to="/history">{t('pagetitle_history')}</Link>
         <Link style={styles.link} to="/fleet">{t('pagetitle_fleet')}</Link>
-        {/* <Link style={styles.link} to="/dashboard">{t('pagetitle_dashboard')}</Link> */}
+        <Link style={styles.link} to="/dashboard">{t('pagetitle_dashboard')}</Link>
         {/* <Link style={styles.link} to="/stats">{t('pagetitle_stats')}</Link> */}
       </div>
       <div style={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
