@@ -98,6 +98,52 @@ export async function fetchVehicleDailyHistory(date: string): Promise<VehicleDai
 }
 
 
+// class RouteHistorySnapshot(BaseModel):
+//     observed_at: datetime
+//     direction: int
+//     vehicle_id: str
+//     last_stop_id: Optional[str]
+//     cur_stop_id: Optional[str]
+//     trip_id: Optional[str]
+//     trip_headsign: Optional[str]
+
+// @router.get("/history/route-snapshot", response_model=List[RouteHistorySnapshot])
+// async def get_route_history_snapshot(
+//     route_id: str = Query(...),
+//     date: str = Query(...), # Format: YYYY-MM-DD
+//     time: Optional[str] = Query("00:00")
+// ):
+
+
+export interface RouteSnapshot {
+  observed_at: string;
+  direction: number;
+  vehicle_id: string;
+  last_stop_id?: string;
+  cur_stop_id?: string;
+  trip_id?: string;
+  trip_headsign?: string;
+}
+
+export async function fetchRouteSnapshot(routeId: string, date: string, time: string): Promise<RouteSnapshot[] | null> {
+  const url = new URL(`${API_BASE}/api/history/route-snapshot`);
+  url.searchParams.set("route_id", routeId);
+  url.searchParams.set("date", date);
+  url.searchParams.set("time", time);
+
+  try {
+    const res = await fetch(url.toString(), { cache: "no-store" });
+    if (!res.ok) {
+      console.warn("Fetch route observations snapshot returned non-OK status:", res.status);
+      return null;
+    }
+    return (await res.json()) as RouteSnapshot[];
+  } catch (err) {
+    console.error("Error fetching route observations snapshot for route", routeId, "on date", date, "and time", time, ":", err);
+    return null;
+  }
+}
+
 // ==================================
 //              SHAPES
 // ==================================
@@ -143,7 +189,30 @@ export async function fetchTripShape(
     if (!res.ok) return null;
     return res.json();
   } catch (err) {
-    console.error("Error fetching trip shape:", err);
+    console.error("Error fetching shape for trip_id", tripId, ":", err);
+    return null;
+  }
+}
+
+export type ShapeIdItem = {
+  shape_id: string; 
+};
+
+// Array of shape_id string items
+export type ShapeIdsResponse = ShapeIdItem[];
+
+export async function fetchMainShapeIdsRoute(routeId: string): Promise<ShapeIdsResponse | null> {
+  if (!routeId) return null;
+  
+  const url = new URL(`${API_BASE}/api/shapes/shape_id/route`);
+  url.searchParams.set("route_id", routeId.trim());
+
+  try {
+    const res = await fetch(url.toString(), { cache: "no-store" });
+    if (!res.ok) return null;
+    return (await res.json()) as ShapeIdsResponse;
+  } catch (err) {
+    console.error("Error fetching shape_ids for route", routeId, ":", err);
     return null;
   }
 }
@@ -458,6 +527,7 @@ export interface StopPoint {
   stop_id: string;
   stop_name: string;
   coordinates: [number, number];
+  distance_percentage: number;
 }
 
 export interface ShapeSpine {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { fetchAllRoutes, fetchShapeSpine, type AllRoutes, type ShapeSpine, type StopPoint } from "../api/client";
+import { fetchAllRoutes, fetchShapeSpine, fetchMainShapeIdsRoute, fetchRouteSnapshot, 
+    type AllRoutes, type ShapeSpine, type RouteSnapshot } from "../api/client";
 import { RouteSelector } from "../components/RouteSelector";
 import { getRouteColors } from "../components/Map";
 import { useLanguage } from "../context/LanguageContext";
@@ -12,12 +13,27 @@ export function DashboardPage() {
     const [allRoutes, setAllRoutes] = useState<AllRoutes[]>([]);
     const [selectedRoute, setSelectedRoute] = useState<string>("");
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedTime, setSelectedTime] = useState(() => {
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        return `${hh}:${mm}`; // e.g., "19:30"
+    });
 
     // Results
-    const [ShapeSpine0, setShapeSpine0] = useState<ShapeSpine | null>(null);
-    const [ShapeSpine1, setShapeSpine1] = useState<ShapeSpine | null>(null);
+    const [ShapeSpineL, setShapeSpineL] = useState<ShapeSpine | null>(null);
+    const [ShapeSpineR, setShapeSpineR] = useState<ShapeSpine | null>(null);
+    const [selectedRouteSnapshot, setSelectedRouteSnapshot] = useState<RouteSnapshot[] | null>(null);
     const [loading, setLoading] = useState(false);
     const [selectedRouteColors, setRouteColors] = useState({ bgColor: 'transparent', textColor: 'inherit' });    
+
+    const convertPTToUTC = (dateStr: string, timeStr: string): string => {
+        // 1. Combine them into a single string parsing it explicitly in the Europe/Lisbon timezone
+        const localDateTime = new Date(`${dateStr}T${timeStr}:00`);
+        
+        // 2. Convert that exact moment to an ISO string, which converts it to UTC automatically
+        return localDateTime.toISOString(); // e.g., "2026-05-18T18:30:00.000Z"
+    };
 
     // Fetch the routes once when the page mounts
     useEffect(() => {
@@ -40,21 +56,56 @@ export function DashboardPage() {
     const handleSearch = async () => {
 
         // Reset UI state. Clear the page immediately.
-        setShapeSpine0(null);
-        setShapeSpine1(null);
+        setShapeSpineL(null);
+        setShapeSpineR(null);
         setLoading(true);
         try {
             
-            // For each search, we must obtain the shape spines for directions 0 and 1. 
+            let shapeIds = null;
+            // Fetch main shape ids for route only if selectedRoute is not null
+            if (selectedRoute) {
+                shapeIds = await fetchMainShapeIdsRoute(selectedRoute);
+            }
 
-            // BETA - fetch shape stops spine for a fixed shape
-            const data0 = await fetchShapeSpine("205_0_1|0");
-            setShapeSpine0(data0);
+            const shapeIdL = shapeIds?.[0]?.shape_id;
+            const shapeIdR = shapeIds?.[1]?.shape_id;
 
-            const data1 = await fetchShapeSpine("205_0_2|0");
-            setShapeSpine1(data1);
+            // For each search, we must obtain the shape spines for directions 0 and 1, 
+            // to be displayed side-by-side on the route dashboard. 
+            if (shapeIdL) {
+                const dataL = await fetchShapeSpine(shapeIdL);
+                setShapeSpineL(dataL);
+            } else {
+                setShapeSpineL(null); // Clear previous state if no left spine exists
+            }
 
-            const selectedRouteColors = getRouteColors("205", 0);
+            if (shapeIdR) {
+                const dataR = await fetchShapeSpine(shapeIdR);
+                setShapeSpineR(dataR);
+            } else {
+                setShapeSpineR(null); // Clear previous state if no right spine exists
+            }
+
+            let selectedTimeUTC = "";
+            if (selectedDate && selectedTime) {
+                selectedTimeUTC = convertPTToUTC(selectedDate, selectedTime);
+            } else {
+                const now = new Date();
+                const todays_date = new Date().toISOString().split('T')[0];
+                const hh = String(now.getHours()).padStart(2, '0');
+                const mm = String(now.getMinutes()).padStart(2, '0');
+                selectedTimeUTC = convertPTToUTC(todays_date, `${hh}:${mm}`);
+            }
+
+            if (selectedRoute && selectedDate) {
+                const selectedRouteSnapshot = await fetchRouteSnapshot(selectedRoute, selectedDate, selectedTimeUTC);
+                
+                if (selectedRouteSnapshot) {
+                    setSelectedRouteSnapshot(selectedRouteSnapshot);
+                }
+            }
+
+            const selectedRouteColors = getRouteColors(selectedRoute, 0);
             setRouteColors({
                 bgColor: selectedRouteColors.bgColor || 'transparent',
                 textColor: selectedRouteColors.textColor || 'var--(text-main)'
@@ -91,7 +142,7 @@ export function DashboardPage() {
     // }, [VehicleDailyHistory, selectedRoute]);
 
     return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "auto" }}>
 
         {/* Search Controls */}
         <div style={{ padding: "15px", display: "flex", gap: "10px", flexWrap: "wrap", 
@@ -116,26 +167,29 @@ export function DashboardPage() {
         </button>
         </div>
         
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
             <section>
                 <RouteDashboard
-                    outboundSpine={ShapeSpine0}
+                    outboundSpine={ShapeSpineL}
                     inboundSpine={null}
                     selectedRoute={selectedRoute}
                     selectedRouteColors={selectedRouteColors}
+                    routeSnapshot={selectedRouteSnapshot}
                 >
                 </RouteDashboard>
             </section>
             <section>
                 <RouteDashboard
                     outboundSpine={null}
-                    inboundSpine={ShapeSpine1}
+                    inboundSpine={ShapeSpineR}
                     selectedRoute={selectedRoute}
                     selectedRouteColors={selectedRouteColors}
+                    routeSnapshot={selectedRouteSnapshot}
                 >
                 </RouteDashboard>
             </section>
         </div>
+        <div style={{ minHeight: "60px" }}>&nbsp;</div>
 
         {/* <div style={{ padding: "10px", fontSize: "12px" , color: "var(--text-secondary)" }}>
             ℹ️ {t("fleet_dash_legend")}

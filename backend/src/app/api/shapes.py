@@ -1,9 +1,11 @@
 import json
+import os
 import psycopg
 from fastapi import APIRouter, HTTPException, Query
 from app.config import settings
 
 router = APIRouter()
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 @router.get("/shapes/route")
 async def get_shape_by_route(
@@ -20,7 +22,7 @@ async def get_shape_by_route(
     """
     
     try:
-        with psycopg.connect(settings.database_url) as conn:
+        with psycopg.connect(DATABASE_URL) as conn:
             with conn.cursor() as cur:
                 cur.execute(query, (route_id, direction_id, variant_id))
                 row = cur.fetchone()
@@ -55,7 +57,7 @@ async def get_shape_by_trip(
     iterations = 20 if acceptTripFromOtherServiceCalendar and len(trip_id_parts) > 2 else 1
 
     try:
-        with psycopg.connect(settings.database_url) as conn:
+        with psycopg.connect(DATABASE_URL) as conn:
             for offset in range(iterations):
                 
                 if offset == 0:
@@ -93,4 +95,32 @@ async def get_shape_by_trip(
     
     except Exception as e:
         if isinstance(e, HTTPException): raise e
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/shapes/shape_id/route")
+async def get_main_shape_ids_by_route(
+    route_id: str = Query(..., examples=["801"]), 
+):
+    query = """
+        SELECT
+            s.shape_id
+        FROM gtfs.shapes s
+        WHERE s.route_id = %s
+            AND s.variant_id = 0
+    """
+    
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(query, (route_id, ))
+                rows = cur.fetchall()
+                
+                return [
+                    {
+                        "shape_id": row[0]
+                    } for row in rows
+                ]
+
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

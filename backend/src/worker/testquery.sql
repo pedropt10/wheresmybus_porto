@@ -10,7 +10,7 @@ SELECT COUNT(*) FROM bus.vehicle_observation;
 
 SELECT * FROM bus.vehicle_observation
 -- WHERE observed_at >= '2026-04-19 18:00'
-WHERE observed_at >= '2026-04-20 23:31:00'
+WHERE observed_at >= '2026-05-18 17:43:00'
 -- AND vehicle_id = '3504'
 -- AND trip_id = '205_0_1|223|D3|T1|N15'
 -- AND cur_stop_id IS NOT NULL
@@ -118,36 +118,16 @@ ORDER BY o.vehicle_id ASC;
 SELECT * FROM gtfs.shapes
 WHERE shape_id = '300_0_3|0'
 
+SELECT * FROM gtfs.shape_stops
+WHERE shape_id = '300_0_3|0'
 
-
-WITH line_geom AS (
-    -- 1. Grab the pre-compiled street route LineString directly
-    SELECT 
-        ST_AsGeoJSON(geom)::jsonb as line_geom
-    FROM gtfs.shapes
-    WHERE shape_id = '300_0_3|0'
-    LIMIT 1
-),
-stop_list AS (
-    -- 2. Aggregate the passenger node points snapped along this shape itinerary
-    SELECT 
-        jsonb_agg(jsonb_build_object(
-            'stop_id', s.stop_id,
-            'stop_name', s.stop_name,
-            'coordinates', jsonb_build_array(s.stop_lon, s.stop_lat)
-        ) ORDER BY ss.stop_sequence ASC) as stops
-    FROM gtfs.shape_stops ss
-    JOIN gtfs.stops s ON ss.stop_id = s.stop_id
-    WHERE ss.shape_id = '300_0_3|0'
-),
-direction_lookup AS (
-    -- 3. Grab the direction attribute if it exists via metadata logs
-    SELECT direction_id 
-    FROM gtfs.trips 
-    WHERE shape_id = '300_0_3|0'
-    LIMIT 1
-)
 SELECT 
-    COALESCE((SELECT direction_id FROM direction_lookup), 0) as direction_id,
-    (SELECT line_geom FROM line_geom) as geometry,
-    COALESCE((SELECT stops FROM stop_list), '[]'::jsonb) as stops;
+    max(ss.shape_dist_traveled)
+FROM gtfs.shape_stops ss
+WHERE ss.shape_id = '300_0_3|0'
+
+SELECT
+    s.shape_id
+FROM gtfs.shapes s
+WHERE s.route_id = '205'
+    AND s.variant_id = 0

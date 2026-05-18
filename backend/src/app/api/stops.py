@@ -125,6 +125,7 @@ class StopPoint(BaseModel):
     stop_id: str
     stop_name: str
     coordinates: List[float]  # [longitude, latitude]
+    distance_percentage: float;
 
 class ShapeSpineResponse(BaseModel):
     shape_id: str
@@ -150,14 +151,26 @@ async def get_stop_spines_by_shape(
             WHERE shape_id = %s
             LIMIT 1
         ),
+        max_shape_dist_traveled AS (
+            -- 2. Determine the maximum value of shape_dist_traveled, to calculate relative path distance at each stop
+            --    Aliased & protected against division by zero
+            SELECT 
+                COALESCE(MAX(ss.shape_dist_traveled), 1.0) as max_dist
+            FROM gtfs.shape_stops ss
+            WHERE ss.shape_id = %s
+        ),
         stop_list AS (
             -- 2. Aggregate the passenger node points snapped along this shape itinerary
             SELECT 
-                jsonb_agg(jsonb_build_object(
-                    'stop_id', s.stop_id,
-                    'stop_name', s.stop_name,
-                    'coordinates', jsonb_build_array(s.stop_lon, s.stop_lat)
-                ) ORDER BY ss.stop_sequence ASC) as stops
+                jsonb_agg(
+                    jsonb_build_object(
+                        'stop_id', s.stop_id,
+                        'stop_name', s.stop_name,
+                        'coordinates', jsonb_build_array(s.stop_lon, s.stop_lat),
+                        -- Extracted using a scalar subquery from the max CTE
+                        'distance_percentage', ((ss.shape_dist_traveled / (SELECT max_dist FROM max_shape_dist_traveled))*100)
+                    ) ORDER BY ss.stop_sequence ASC
+                ) as stops
             FROM gtfs.shape_stops ss
             JOIN gtfs.stops s ON ss.stop_id = s.stop_id
             WHERE ss.shape_id = %s
@@ -171,14 +184,14 @@ async def get_stop_spines_by_shape(
         )
         SELECT 
             COALESCE((SELECT direction_id FROM direction_lookup), 0) as direction_id,
-            (SELECT line_geom FROM line_geom) as geometry,
+            COALESCE((SELECT line_geom FROM line_geom), '{}'::jsonb) as geometry,
             COALESCE((SELECT stops FROM stop_list), '[]'::jsonb) as stops;
     """
     
     try:
         with psycopg.connect(DATABASE_URL) as conn:
             with conn.cursor() as cur:
-                cur.execute(query, (shape_id, shape_id, shape_id))
+                cur.execute(query, (shape_id, shape_id, shape_id, shape_id))
                 row = cur.fetchone()
                 
                 if not row or row[1] is None:

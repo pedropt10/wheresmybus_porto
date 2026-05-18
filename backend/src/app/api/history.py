@@ -360,34 +360,7 @@ class VehicleDailyHistory(BaseModel):
 async def get_all_vehicles_daily_activity(
     date: str = Query(..., examples=["2026-05-15"])
 ):
-    # sql = """
-    #     SELECT 
-    #         o.vehicle_id,
-    #         f.vehicle_license_plate,
-    #         f.vehicle_type,
-    #         f.vehicle_fuel,
-    #         f.vehicle_model,
-    #         f.vehicle_chassis_year,
-    #         jsonb_agg(DISTINCT jsonb_build_object(
-    #             'route_id', o.route_id,
-    #             'route_short_name', COALESCE(r.route_short_name, 'Unknown Route'),
-    #             'route_long_name', COALESCE(r.route_long_name, 'Unknown Route')
-    #         )) as route_list
-    #     FROM bus.vehicle_observation o
-    #     LEFT JOIN gtfs.routes r ON o.route_id = r.route_id
-    #     LEFT JOIN bus.fleet f ON o.vehicle_id = f.vehicle_id
-    #     WHERE o.observed_at >= %s 
-    #       AND o.observed_at < (%s::date + '1 day'::interval)
-    #     GROUP BY 
-    #         o.vehicle_id, 
-    #         f.vehicle_license_plate, 
-    #         f.vehicle_type, 
-    #         f.vehicle_fuel, 
-    #         f.vehicle_model, 
-    #         f.vehicle_chassis_year
-    #     ORDER BY o.vehicle_id ASC;
-    # """
-    
+     
     sql = """
         WITH route_bounds AS (
             SELECT 
@@ -476,3 +449,59 @@ async def get_all_vehicles_daily_activity(
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch fleet activity.")
+    
+
+
+class RouteSnapshot(BaseModel):
+    observed_at: datetime
+    direction: int
+    vehicle_id: str
+    last_stop_id: Optional[str]
+    cur_stop_id: Optional[str]
+    trip_id: Optional[str]
+    trip_headsign: Optional[str]
+
+@router.get("/history/route-snapshot", response_model=List[RouteSnapshot])
+async def get_route_observations_snapshot(
+    route_id: str = Query(...),
+    date: str = Query(...), # Format: YYYY-MM-DD
+    time: str = Query("00:00")
+):
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                sql = """
+                    SELECT DISTINCT ON (o.vehicle_id)
+                        o.observed_at,
+                        o.vehicle_id, 
+                        o.direction, 
+                        o.last_stop_id, 
+                        o.cur_stop_id,
+                        t.trip_id,
+                        t.trip_headsign
+                    FROM bus.vehicle_observation o
+                    LEFT JOIN gtfs.trips t ON o.trip_id = t.trip_id
+                    WHERE o.route_id = %s 
+                        AND o.observed_at >= (%s::date + %s::time) - INTERVAL '2 minutes'
+                        AND o.observed_at <= (%s::date + %s::time)
+                    ORDER BY o.vehicle_id, o.observed_at DESC;
+                    """
+
+                cur.execute(sql, (route_id, date, time, date, time, ))
+                rows = cur.fetchall()
+
+                return [
+                    RouteSnapshot(
+                        observed_at=row[0],
+                        vehicle_id=row[1],
+                        direction=row[2],
+                        last_stop_id=row[3],
+                        cur_stop_id=row[4],
+                        trip_id=row[5],
+                        trip_headsign=row[6]
+                    ) for row in rows
+                ]
+
+    except Exception as e:
+        print(f"History Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
