@@ -12,7 +12,7 @@ from app.api.trips import router as trips_router
 from app.api.vehicles import router as vehicles_router
 from app.api.history import router as history_router
 
-app = FastAPI(title="Bus Tracker API", version="0.1.0")
+app = FastAPI(title="Where's My Bus? API", version="0.1.0")
 
 origins = [o.strip() for o in settings.cors_allow_origins.split(",") if o.strip()]
 app.add_middleware(
@@ -44,4 +44,4 @@ app.include_router(vehicles_router, prefix="/api", tags=["Vehicles"])
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=False)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8001, reload=False)

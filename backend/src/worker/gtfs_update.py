@@ -43,6 +43,8 @@ def download_latest_gtfs_if_needed():
         print(f"Found latest file: {file_name}")
         print(f"Upload date: {latest_res.get('created')}")
 
+        download_dir = os.path.join(GTFS_PATH, "package_downloads")
+
         # Check if we already have this file downloaded
         if os.path.exists(os.path.join(GTFS_PATH, "package_downloads", file_name)):
             print(f"File {file_name} already exists.")
@@ -50,7 +52,10 @@ def download_latest_gtfs_if_needed():
         else:
             print(f"Downloading from: {file_url} ...")
 
-            # 4. Download the file
+            # Ensure the directory path exists before writing to it
+            os.makedirs(download_dir, exist_ok=True)
+
+            # Download the file
             with requests.get(file_url, stream=True) as r:
                 r.raise_for_status()
                 new_gtfs_filepath_ = os.path.join(GTFS_PATH, "package_downloads", file_name)

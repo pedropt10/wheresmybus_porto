@@ -1,7 +1,7 @@
 services:
   db:
     image: postgis/postgis:16-3.4
-    container_name: bus_db
+    container_name: wheresmybus_db
     env_file: .env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -26,7 +26,7 @@ services:
     # profiles: ["setup"]
     build:
       context: ./backend
-    container_name: bus_gtfs_and_fleet_ingest
+    container_name: wheresmybus_gtfs_and_fleet_ingest
     env_file: .env
     environment:
       DATABASE_URL: ${DATABASE_URL}
@@ -35,12 +35,14 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app
+      - ./database/migrations/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+      - ./database/migrations/002_indexes.sql:/docker-entrypoint-initdb.d/002_indexes.sql:ro
     command: ["python", "-m", "worker.gtfs_ingest"]
 
   backend_api:
     build:
       context: ./backend
-    container_name: bus_api
+    container_name: wheresmybus_api
     env_file: .env
     environment:
       DATABASE_URL: ${DATABASE_URL}
@@ -59,7 +61,7 @@ services:
   backend_worker:
     build:
       context: ./backend
-    container_name: bus_worker
+    container_name: wheresmybus_worker
     volumes:
       - ./backend:/app
     env_file: .env
@@ -78,7 +80,7 @@ services:
   frontend:
     build:
       context: ./frontend
-    container_name: bus_frontend
+    container_name: wheresmybus_frontend
     env_file: .env
     depends_on:
       - backend_api
@@ -96,7 +98,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4:8
-    container_name: bus_pgadmin
+    container_name: wheresmybus_pgadmin
     env_file: .env
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
