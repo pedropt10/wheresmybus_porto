@@ -113,6 +113,7 @@ export const translations = {
     gen_destination: "Destino",
     gen_direction: "Sentido",
     gen_go: "Avançar",
+    gen_legend: "Legenda:",
     gen_loading: "A carregar...",
     gen_na: "(não disponível)",
     gen_route: "Linha",
