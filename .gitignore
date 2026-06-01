@@ -1,3 +1,4 @@
 .env
 backend/gtfs/archive
 backend/gtfs/package_downloads
+frontend/node_modules
